@@ -25,23 +25,40 @@
 
 package com.sun.scenario.animation.shared;
 
+import com.sun.javafx.util.Utils;
+
 import javafx.animation.Animation;
 import javafx.animation.Animation.Status;
 import javafx.util.Duration;
 
+/**
+ * Clip envelope implementation for a single cycle: cycleCount = 1 or cycleDuration = indefinite
+ */
 public class SingleLoopClipEnvelope extends ClipEnvelope {
 
     private int cycleCount;
 
+    protected SingleLoopClipEnvelope(Animation animation) {
+        super(animation);
+        if (!animation.getCuePoints().isEmpty())
+            System.out.println("SingleLoopClipEnvelope");
+        if (animation != null) {
+            cycleCount = animation.getCycleCount();
+        }
+    }
+
     @Override
-    public void setRate(double rate) {
-        final Status status = animation.getStatus();
-        if (status != Status.STOPPED) {
-            setInternalCurrentRate((Math.abs(currentRate - this.rate) < EPSILON) ? rate : -rate);
-            deltaTicks = ticks - Math.round((ticks - deltaTicks) * rate / this.rate);
+    public void setRate(double newRate) {
+        if (animation.getStatus() != Status.STOPPED) {
+            deltaTicks = ticks - ticksRateChange(newRate);
             abortCurrentPulse();
         }
-        this.rate = rate;
+        rate = newRate;
+    }
+
+    @Override
+    public double calculateCurrentRunningRate() {
+        return rate;
     }
 
     @Override
@@ -50,25 +67,8 @@ public class SingleLoopClipEnvelope extends ClipEnvelope {
     }
 
     @Override
-    protected double calculateCurrentRate() {
-        return rate;
-    }
-
-    protected SingleLoopClipEnvelope(Animation animation) {
-        super(animation);
-        if (animation != null) {
-            cycleCount = animation.getCycleCount();
-        }
-    }
-
-    @Override
-    public boolean wasSynched() {
-        return super.wasSynched() && cycleCount != 0;
-    }
-
-    @Override
     public ClipEnvelope setCycleDuration(Duration cycleDuration) {
-        if ((cycleCount != 1) && !cycleDuration.isIndefinite()) {
+        if (cycleCount != 1 && !cycleDuration.isIndefinite()) {
             return create(animation);
         }
         updateCycleTicks(cycleDuration);
@@ -77,11 +77,16 @@ public class SingleLoopClipEnvelope extends ClipEnvelope {
 
     @Override
     public ClipEnvelope setCycleCount(int cycleCount) {
-        if ((cycleCount != 1) && (cycleTicks != ClipEnvelope.INDEFINITE)) {
+        if (cycleCount != 1 && cycleTicks != ClipEnvelope.INDEFINITE) {
             return create(animation);
         }
         this.cycleCount = cycleCount;
         return this;
+    }
+
+    @Override
+    public boolean wasSynched() {
+        return super.wasSynched() && cycleCount != 0;
     }
 
     @Override
@@ -93,11 +98,12 @@ public class SingleLoopClipEnvelope extends ClipEnvelope {
         inTimePulse = true;
 
         try {
-            ticks = ClipEnvelope.checkBounds(deltaTicks + Math.round(currentTick * currentRate), cycleTicks);
+            long ticksChange = Math.round(currentTick * rate); // curRate == rate
+            ticks = Utils.clamp(0, deltaTicks + ticksChange, cycleTicks); // cycleTicks == totalTicks
             AnimationAccessor.getDefault().playTo(animation, ticks, cycleTicks);
 
-            final boolean reachedEnd = (currentRate > 0)? (ticks == cycleTicks) : (ticks == 0);
-            if(reachedEnd && !aborted) {
+            final boolean reachedEnd = (rate > 0) ? (ticks == cycleTicks) : (ticks == 0);
+            if (reachedEnd && !aborted) {
                 AnimationAccessor.getDefault().finished(animation);
             }
         } finally {
@@ -106,17 +112,23 @@ public class SingleLoopClipEnvelope extends ClipEnvelope {
     }
 
     @Override
-    public void jumpTo(long ticks) {
+    public void jumpTo(long newTicks) {
         if (cycleTicks == 0L) {
             return;
         }
-        final long newTicks = ClipEnvelope.checkBounds(ticks, cycleTicks);
-        deltaTicks += (newTicks - this.ticks);
-        this.ticks = newTicks;
+        
+        final long oldTicks = ticks;
+        ticks = Utils.clamp(0, newTicks, cycleTicks);
+        final long delta = ticks - oldTicks;
+        if (delta == 0) {
+            if (!animation.getCuePoints().isEmpty())
+                System.out.println("SLCE delta = 0");
+            return;
+        }
+        deltaTicks += delta;
 
         AnimationAccessor.getDefault().jumpTo(animation, newTicks, cycleTicks, false);
 
         abortCurrentPulse();
     }
-
 }

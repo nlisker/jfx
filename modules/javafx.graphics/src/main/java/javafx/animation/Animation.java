@@ -321,7 +321,6 @@ public abstract class Animation {
 
                 @Override
                 public void invalidated() {
-                    final double newRate = getRate();
                     if (isRunningEmbedded()) {
                         if (isBound()) {
                             unbind();
@@ -329,26 +328,24 @@ public abstract class Animation {
                         set(oldRate);
                         throw new IllegalArgumentException("Cannot set rate of embedded animation while running.");
                     }
+                    final double newRate = getRate();
+                    // none 0 -> 0
                     if (isNearZero(newRate)) {
-                        if (isRunning()) {
-                            lastPlayedForward = areNearEqual(getCurrentRate(), oldRate);
-                        }
-                        doSetCurrentRate(0.0);
-                        pauseReceiver();
+//                        if (!isPaused()) { // is not paused check needed?
+                            pauseReceiver();
+                            doSetCurrentRate(0.0);
+//                       }
+                    // ? -> 1
                     } else {
+                        clipEnvelope.setRate(newRate);
                         if (isRunning()) {
-                            final double currentRate = getCurrentRate();
-                            if (isNearZero(currentRate)) {
-                                doSetCurrentRate(lastPlayedForward ? newRate : -newRate);
+                            // 0 -> 1
+                            if (isNearZero(getCurrentRate())) {
                                 resumeReceiver();
-                            } else {
-                                final boolean playingForward = areNearEqual(currentRate, oldRate);
-                                doSetCurrentRate(playingForward ? newRate : -newRate);
                             }
+                            doSetCurrentRate(clipEnvelope.calculateCurrentRunningRate());
                         }
-                        oldRate = newRate;
                     }
-                    clipEnvelope.setRate(newRate);
                 }
 
                 @Override
@@ -405,6 +402,10 @@ public abstract class Animation {
         }
     }
 
+    void setCurrentRate(double currentRate) {
+        doSetCurrentRate(currentRate);
+    }
+
     public final double getCurrentRate() {
         return (currentRate == null) ? DEFAULT_CURRENT_RATE : currentRate.get();
     }
@@ -415,12 +416,6 @@ public abstract class Animation {
         }
         return currentRate;
     }
-
-    void setCurrentRate(double currentRate) {
-//      if (getStatus() == Status.RUNNING) {
-          doSetCurrentRate(currentRate);
-//      }
-  }
 
     /**
      * Read-only variable to indicate the duration of one cycle of this
@@ -1003,6 +998,7 @@ public abstract class Animation {
             case PAUSED:
                 doResume();
                 if (!isNearZero(getRate())) {
+                    doSetCurrentRate(clipEnvelope.calculateCurrentRunningRate());
                     resumeReceiver();
                 }
                 break;
@@ -1010,17 +1006,22 @@ public abstract class Animation {
         }
     }
 
+    boolean startable(boolean forceSync) {
+        return (TickCalculation.fromDuration(getCycleDuration()) > 0L) || (!forceSync && clipEnvelope.wasSynched());
+    }
+
     void doStart(boolean forceSync) {
         sync(forceSync);
-        setStatus(Status.RUNNING);
-        clipEnvelope.start();
-        doSetCurrentRate(clipEnvelope.getCurrentRate());
-        lastPulse = 0;
+//      if (getRate() != 0) {
+          doSetCurrentRate(clipEnvelope.calculateCurrentRunningRate());
+//      }
+      clipEnvelope.start();
+      lastPulse = 0;
+      setStatus(Status.RUNNING);
     }
 
     void doResume() {
         setStatus(Status.RUNNING);
-        doSetCurrentRate(lastPlayedForward ? getRate() : -getRate());
     }
 
     /**
@@ -1050,8 +1051,9 @@ public abstract class Animation {
         if (!paused) {
             timer.removePulseReceiver(pulseReceiver);
         }
-        setStatus(Status.STOPPED);
+        clipEnvelope.stop();
         doSetCurrentRate(0.0);
+        setStatus(Status.STOPPED);
     }
 
     /**
@@ -1070,17 +1072,17 @@ public abstract class Animation {
             throw new IllegalStateException("Cannot pause when embedded in another animation");
         }
         if (isRunning()) {
-            clipEnvelope.abortCurrentPulse();
+            clipEnvelope.abortCurrentPulse(); // why abort current pulse?
             pauseReceiver();
             doPause();
         }
     }
 
     void doPause() {
-        final double currentRate = getCurrentRate();
-        if (!isNearZero(currentRate)) {
-            lastPlayedForward = areNearEqual(getCurrentRate(), getRate());
-        }
+//        final double currentRate = getCurrentRate();
+//        if (!isNearZero(currentRate)) {
+//            lastPlayedForward = areNearEqual(getCurrentRate(), getRate());
+//        }
         doSetCurrentRate(0.0);
         setStatus(Status.PAUSED);
     }
@@ -1158,10 +1160,6 @@ public abstract class Animation {
         this.targetFramerate = TickCalculation.TICKS_PER_SECOND / resolution;
         this.clipEnvelope = clipEnvelope;
         this.timer = timer;
-    }
-
-    boolean startable(boolean forceSync) {
-        return (TickCalculation.fromDuration(getCycleDuration()) > 0L) || (!forceSync && clipEnvelope.wasSynched());
     }
 
     void sync(boolean forceSync) {
