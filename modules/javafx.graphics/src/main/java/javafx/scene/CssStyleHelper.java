@@ -468,7 +468,7 @@ final class CssStyleHelper {
             final StyleOrigin styleOrigin = styleableProperty.getStyleOrigin();
             if (styleOrigin != null && styleOrigin != StyleOrigin.USER) {
                 final CalculatedValue calculatedValue = resetValues.getValue();
-                styleableProperty.applyStyle(calculatedValue.getOrigin(), calculatedValue.getValue());
+                styleableProperty.applyStyle(calculatedValue.origin(), calculatedValue.value());
             }
         }
     }
@@ -630,7 +630,7 @@ final class CssStyleHelper {
 
         }
 
-        final Font fontForRelativeSizes = (Font)cachedFont.getValue();
+        final Font fontForRelativeSizes = (Font)cachedFont.value();
 
         final StyleCacheEntry.Key cacheEntryKey = new StyleCacheEntry.Key(transitionStates, fontForRelativeSizes);
         StyleCacheEntry cacheEntry = sharedCache.getStyleCacheEntry(cacheEntryKey);
@@ -731,7 +731,7 @@ final class CssStyleHelper {
 
                         StyleableProperty styleableProperty = cssMetaData.getStyleableProperty(node);
                         if (styleableProperty.getStyleOrigin() != StyleOrigin.USER) {
-                            styleableProperty.applyStyle(initialValue.getOrigin(), initialValue.getValue());
+                            styleableProperty.applyStyle(initialValue.origin(), initialValue.value());
                         }
                     }
 
@@ -758,7 +758,7 @@ final class CssStyleHelper {
                 // skip the value. A style from a user agent stylesheet should
                 // not override the user set style.
                 //
-                final StyleOrigin originOfCalculatedValue = calculatedValue.getOrigin();
+                final StyleOrigin originOfCalculatedValue = calculatedValue.origin();
 
                 // A calculated value should never have a null style origin since that would
                 // imply the style didn't come from a stylesheet or in-line style.
@@ -773,7 +773,7 @@ final class CssStyleHelper {
                     }
                 }
 
-                final Object value = calculatedValue.getValue();
+                final Object value = calculatedValue.value();
                 final Object currentValue = styleableProperty.getValue();
 
                 // RT-21185: Only apply the style if something has changed.
@@ -823,8 +823,8 @@ final class CssStyleHelper {
                 if (cacheContainer != null && cacheContainer.cssSetProperties != null) {
                     cachedValue = cacheContainer.cssSetProperties.get(cssMetaData);
                 }
-                Object value = (cachedValue != null) ? cachedValue.getValue() : cssMetaData.getInitialValue(node);
-                StyleOrigin origin = (cachedValue != null) ? cachedValue.getOrigin() : null;
+                Object value = (cachedValue != null) ? cachedValue.value() : cssMetaData.getInitialValue(node);
+                StyleOrigin origin = (cachedValue != null) ? cachedValue.origin() : null;
                 try {
                     styleableProperty.applyStyle(origin, value);
                 } catch (Exception ebad) {
@@ -952,18 +952,18 @@ final class CssStyleHelper {
                         if (subs == null) {
                             subs = new HashMap<>();
                         }
-                        subs.put(subkey, constituent.getValue());
+                        subs.put(subkey, constituent.value());
 
                         // origin of this style is the most specific
-                        if ((origin != null && constituent.getOrigin() != null)
-                                ? origin.compareTo(constituent.getOrigin()) < 0
-                                : constituent.getOrigin() != null) {
-                            origin = constituent.getOrigin();
+                        if ((origin != null && constituent.origin() != null)
+                                ? origin.compareTo(constituent.origin()) < 0
+                                : constituent.origin() != null) {
+                            origin = constituent.origin();
                         }
 
                         // if the constiuent uses relative sizes, then
                         // isRelative is true;
-                        isRelative = isRelative || constituent.isRelative();
+                        isRelative = isRelative || constituent.relative();
 
                     }
                 }
@@ -1399,7 +1399,7 @@ final class CssStyleHelper {
                 Font fontForFontRelativeSizes = null;
 
                 if (isRelative && isFontProperty &&
-                    (fontFromCacheEntry == null || fontFromCacheEntry.isRelative())) {
+                    (fontFromCacheEntry == null || fontFromCacheEntry.relative())) {
 
                     Styleable parent = styleable;
                     CalculatedValue childsCachedFont = fontFromCacheEntry;
@@ -1409,7 +1409,7 @@ final class CssStyleHelper {
 
                         if (parentsCachedFont != null)  {
 
-                            if (parentsCachedFont.isRelative()) {
+                            if (parentsCachedFont.relative()) {
 
                                 //
                                 // If the cached fonts are the same, then the cached font came from the same
@@ -1418,12 +1418,12 @@ final class CssStyleHelper {
                                 if (childsCachedFont == null || parentsCachedFont.equals(childsCachedFont)) {
                                     childsCachedFont = parentsCachedFont;
                                 } else {
-                                    fontForFontRelativeSizes = (Font)parentsCachedFont.getValue();
+                                    fontForFontRelativeSizes = (Font)parentsCachedFont.value();
                                 }
 
                             } else  {
                                 // fontValue.isRelative() == false!
-                                fontForFontRelativeSizes = (Font)parentsCachedFont.getValue();
+                                fontForFontRelativeSizes = (Font)parentsCachedFont.value();
                             }
 
                         }
@@ -1435,8 +1435,8 @@ final class CssStyleHelper {
                 // did we get a fontValue from the preceding block?
                 // if not, get it from our cacheEntry or choose the default
                 if (fontForFontRelativeSizes == null) {
-                    if (fontFromCacheEntry != null && fontFromCacheEntry.isRelative() == false) {
-                        fontForFontRelativeSizes = (Font)fontFromCacheEntry.getValue();
+                    if (fontFromCacheEntry != null && fontFromCacheEntry.relative() == false) {
+                        fontForFontRelativeSizes = (Font)fontFromCacheEntry.value();
                     } else {
                         fontForFontRelativeSizes = Font.getDefault();
                     }
@@ -1755,9 +1755,9 @@ final class CssStyleHelper {
                                 styleMap, states, styleable, parentCachedFont);
 
                 // cv could be SKIP
-                if (cv.getValue() instanceof Font) {
-                    origin = cv.getOrigin();
-                    Font font = (Font)cv.getValue();
+                if (cv.value() instanceof Font/* font */) {
+                    origin = cv.origin();
+                    Font font = (Font) cv.value();
                     family = getFontFamily(font);
                     size = font.getSize();
                     weight = getFontWeight(font);
@@ -1801,19 +1801,19 @@ final class CssStyleHelper {
                     calculateValue(fontSize, styleable, dummyFontProperty,
                             styleMap, states, styleable, parentCachedFont);
 
-            if (cv.getValue() instanceof Double) {
+            if (cv.value() instanceof Double) {
                 if (origin == null || origin.compareTo(fontSize.getOrigin()) <= 0) {
 
-                    origin = cv.getOrigin();
+                    origin = cv.origin();
                 }
-                size = (Double) cv.getValue();
+                size = (Double) cv.value();
 
                 if (cvFont != null) {
-                    boolean isRelative = cvFont.isRelative() || cv.isRelative();
-                    Font font = deriveFont((Font) cvFont.getValue(), family, weight, posture, size);
+                    boolean isRelative = cvFont.relative() || cv.relative();
+                    Font font = deriveFont((Font) cvFont.value(), family, weight, posture, size);
                     cvFont = new CalculatedValue(font, origin, isRelative);
                 } else {
-                    boolean isRelative = cv.isRelative();
+                    boolean isRelative = cv.relative();
                     Font font = deriveFont(Font.getDefault(), family, weight, posture, size);
                     cvFont = new CalculatedValue(font, origin, isRelative);
                 }
@@ -1855,11 +1855,11 @@ final class CssStyleHelper {
                     calculateValue(fontWeight, styleable, dummyFontProperty,
                             styleMap, states, styleable, null);
 
-            if (cv.getValue() instanceof FontWeight) {
+            if (cv.value() instanceof FontWeight) {
                 if (origin == null || origin.compareTo(fontWeight.getOrigin()) <= 0) {
-                    origin = cv.getOrigin();
+                    origin = cv.origin();
                 }
-                weight = (FontWeight)cv.getValue();
+                weight = (FontWeight)cv.value();
                 foundStyle = true;
             }
         }
@@ -1892,11 +1892,11 @@ final class CssStyleHelper {
                     calculateValue(fontStyle, styleable, dummyFontProperty,
                             styleMap, states, styleable, null);
 
-            if (cv.getValue() instanceof FontPosture) {
+            if (cv.value() instanceof FontPosture) {
                 if (origin == null || origin.compareTo(fontStyle.getOrigin()) <= 0) {
-                    origin = cv.getOrigin();
+                    origin = cv.origin();
                 }
-                posture = (FontPosture)cv.getValue();
+                posture = (FontPosture)cv.value();
                 foundStyle = true;
             }
 
@@ -1929,11 +1929,11 @@ final class CssStyleHelper {
                     calculateValue(fontFamily, styleable, dummyFontProperty,
                             styleMap, states, styleable, null);
 
-            if (cv.getValue() instanceof String) {
+            if (cv.value() instanceof String) {
                 if (origin == null || origin.compareTo(fontFamily.getOrigin()) <= 0) {
-                    origin = cv.getOrigin();
+                    origin = cv.origin();
                 }
-                family = (String)cv.getValue();
+                family = (String)cv.value();
                 foundStyle = true;
             }
 
@@ -1941,7 +1941,7 @@ final class CssStyleHelper {
 
         if (foundStyle) {
 
-            Font font = cvFont != null ? (Font)cvFont.getValue() : Font.getDefault();
+            Font font = cvFont != null ? (Font)cvFont.value() : Font.getDefault();
             Font derivedFont = deriveFont(font, family, weight, posture, size);
             return new CalculatedValue(derivedFont,origin,false);
 

@@ -60,7 +60,7 @@ final class CursorUtils {
     public static Dimension2D getBestCursorSize(int preferredWidth,
                                                 int preferredHeight) {
         Size size = Cursor.getBestSize(preferredWidth, preferredHeight);
-        return new Dimension2D(size.width, size.height);
+        return new Dimension2D(size.width(), size.height());
     }
 
     private static Cursor createPlatformCursor(final CursorFrame cursorFrame) {

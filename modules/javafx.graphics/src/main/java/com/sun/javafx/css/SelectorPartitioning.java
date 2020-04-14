@@ -50,37 +50,39 @@ public final class SelectorPartitioning {
      * Wrapper so that we can have Map<ParitionKey, Partition> even though
      * the innards of the key might be a String or long[]
      */
-    private final static class PartitionKey<K> {
+//    private final static class PartitionKey<K> {
+//
+//        private final K key;
+//
+//        private PartitionKey(K key) {
+//            this.key = key;
+//        }
+//
+//        @Override
+//        public boolean equals(Object obj) {
+//            if (obj == null) {
+//                return false;
+//            }
+//            if (getClass() != obj.getClass()) {
+//                return false;
+//            }
+//            final PartitionKey<K> other = (PartitionKey<K>) obj;
+//            if (this.key != other.key && (this.key == null || !this.key.equals(other.key))) {
+//                return false;
+//            }
+//            return true;
+//        }
+//
+//        @Override
+//        public int hashCode() {
+//            int hash = 7;
+//            hash = 71 * hash + (this.key != null ? this.key.hashCode() : 0);
+//            return hash;
+//        }
+//
+//    }
 
-        private final K key;
-
-        private PartitionKey(K key) {
-            this.key = key;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final PartitionKey<K> other = (PartitionKey<K>) obj;
-            if (this.key != other.key && (this.key == null || !this.key.equals(other.key))) {
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 7;
-            hash = 71 * hash + (this.key != null ? this.key.hashCode() : 0);
-            return hash;
-        }
-
-    }
+    private record PartitionKey<K>(K key) {}
 
     /**
      * A Partition corresponds to a selector type, id or styleclass. For any
@@ -108,8 +110,8 @@ public final class SelectorPartitioning {
         private List<Selector> selectors;
 
         private Partition(PartitionKey key) {
-           this.key = key;
-            slots = new HashMap<PartitionKey,Slot>();
+            this.key = key;
+            slots = new HashMap<PartitionKey, Slot>();
         }
 
         private void addSelector(Selector pair) {

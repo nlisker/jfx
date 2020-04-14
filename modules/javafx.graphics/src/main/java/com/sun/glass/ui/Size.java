@@ -24,24 +24,27 @@
  */
 package com.sun.glass.ui;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
+//public final class Size {
+//    public int width;
+//    public int height;
+//
+//    public Size(int width, int height) {
+//        this.width = width;
+//        this.height = height;
+//    }
+//
+//    public Size() {
+//        this(0, 0);
+//    }
+//
+//    @Override public String toString() {
+//        return "Size(" + width + ", " + height + ")";
+//    }
+//}
 
-public final class Size {
-    public int width;
-    public int height;
-
-    public Size(int width, int height) {
-        this.width = width;
-        this.height = height;
-    }
+public record Size(int width, int height) {
 
     public Size() {
         this(0, 0);
     }
-
-    @Override public String toString() {
-        return "Size(" + width + ", " + height + ")";
-    }
 }
-

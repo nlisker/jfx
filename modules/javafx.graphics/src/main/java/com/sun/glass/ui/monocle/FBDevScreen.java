@@ -211,7 +211,7 @@ class FBDevScreen implements NativeScreen {
                 Buffer b = swCursor.getCursorBuffer();
                 Size size = swCursor.getBestSize();
                 uploadPixels(b, swCursor.getRenderX(), swCursor.getRenderY(),
-                             size.width, size.height, 1.0f);
+                             size.width(), size.height(), 1.0f);
             }
             writeBuffer();
         } catch (IOException e) {
