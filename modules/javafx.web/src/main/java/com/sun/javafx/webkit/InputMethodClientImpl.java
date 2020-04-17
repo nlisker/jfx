@@ -128,7 +128,7 @@ public final class InputMethodClientImpl
             WCPoint point = webPage.getPageClient().windowToScreen(
                     // We need lower left corner of the char bounds rectangle here
                     new WCPoint(loc[0], loc[1] + loc[3]));
-            return new Point2D(point.getIntX(), point.getIntY());
+            return new Point2D(point.intX(), point.intY());
         });
 
         Invoker.getInvoker().invokeOnEventThread(f);
@@ -146,7 +146,7 @@ public final class InputMethodClientImpl
     public int getLocationOffset(int x, int y) {
         FutureTask<Integer> f = new FutureTask<>(() -> {
             WCPoint point = webPage.getPageClient().windowToScreen(new WCPoint(0, 0));
-            return webPage.getClientLocationOffset(x - point.getIntX(), y - point.getIntY());
+            return webPage.getClientLocationOffset(x - point.intX(), y - point.intY());
         });
 
         Invoker.getInvoker().invokeOnEventThread(f);

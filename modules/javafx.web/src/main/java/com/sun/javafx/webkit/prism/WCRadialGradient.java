@@ -39,8 +39,8 @@ import java.util.List;
 final class WCRadialGradient extends WCGradient<RadialGradient> {
 
     static final Comparator<Stop> COMPARATOR = (s1, s2) -> {
-        float o1 = s1.getOffset();
-        float o2 = s2.getOffset();
+        float o1 = s1.offset();
+        float o2 = s2.offset();
         if (o1 < o2) {
             return -1;
         }
@@ -80,11 +80,11 @@ final class WCRadialGradient extends WCGradient<RadialGradient> {
 
     public RadialGradient getPlatformGradient() {
         Collections.sort(this.stops, COMPARATOR);
-        float dx = this.p2.getX() - this.p1.getX();
-        float dy = this.p2.getY() - this.p1.getY();
+        float dx = this.p2.x() - this.p1.x();
+        float dy = this.p2.y() - this.p1.y();
         return new RadialGradient(
-                this.p1.getX(),
-                this.p1.getY(),
+                this.p1.x(),
+                this.p1.y(),
                 (float) (Math.atan2(dy, dx) * 180 / Math.PI),
                 (float) Math.sqrt(dx * dx + dy * dy) * this.r1over,
                 this.r1,
@@ -116,14 +116,14 @@ final class WCRadialGradient extends WCGradient<RadialGradient> {
         if (radius != null) {
             sb.append(", radius=").append(radius);
         }
-        sb.append(", x1=").append(p1.getX());
-        sb.append(", y1=").append(p1.getY());
-        sb.append(", x2=").append(p2.getX());
-        sb.append(", y2=").append(p2.getY());
+        sb.append(", x1=").append(p1.x());
+        sb.append(", y1=").append(p1.y());
+        sb.append(", x2=").append(p2.x());
+        sb.append(", y2=").append(p2.y());
         sb.append(", stops=");
         for (int i = 0; i < stops.size(); i++) {
             sb.append(i == 0 ? "[" : ", ");
-            sb.append(stops.get(i).getOffset()).append(":").append(stops.get(i).getColor());
+            sb.append(stops.get(i).offset()).append(":").append(stops.get(i).color());
         }
         return sb.append("]]").toString();
     }

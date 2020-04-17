@@ -25,21 +25,23 @@
 
 package com.sun.prism.paint;
 
-public class Stop {
+//public class Stop {
+//
+//    private final Color color;
+//    private final float offset;
+//
+//    public Stop(Color color, float offset) {
+//        this.color = color;
+//        this.offset = offset;
+//    }
+//
+//    public Color getColor() {
+//        return color;
+//    }
+//
+//    public float getOffset() {
+//        return offset;
+//    }
+//}
 
-    private final Color color;
-    private final float offset;
-
-    public Stop(Color color, float offset) {
-        this.color = color;
-        this.offset = offset;
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public float getOffset() {
-        return offset;
-    }
-}
+public record Stop(Color color, float offset){}

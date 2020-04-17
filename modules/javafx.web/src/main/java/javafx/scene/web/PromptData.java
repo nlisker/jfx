@@ -38,34 +38,36 @@ import javafx.beans.NamedArg;
  * @see WebEngine#setPromptHandler
  * @since JavaFX 2.0
  */
-public final class PromptData {
+//public final class PromptData {
+//
+//    private final String message;
+//    private final String defaultValue;
+//
+//    /**
+//     * Creates a new instance.
+//     * @param message the message carried by this data object
+//     * @param defaultValue the default value carried by this data object
+//     */
+//    public PromptData(@NamedArg("message") String message, @NamedArg("defaultValue") String defaultValue) {
+//        this.message = message;
+//        this.defaultValue = defaultValue;
+//    }
+//
+//    /**
+//     * Returns the message carried by this data object.
+//     * @return the message
+//     */
+//    public final String getMessage() {
+//        return message;
+//    }
+//
+//    /**
+//     * Returns the default value carried by this data object.
+//     * @return the default value
+//     */
+//    public final String getDefaultValue() {
+//        return defaultValue;
+//    }
+//}
 
-    private final String message;
-    private final String defaultValue;
-
-    /**
-     * Creates a new instance.
-     * @param message the message carried by this data object
-     * @param defaultValue the default value carried by this data object
-     */
-    public PromptData(@NamedArg("message") String message, @NamedArg("defaultValue") String defaultValue) {
-        this.message = message;
-        this.defaultValue = defaultValue;
-    }
-
-    /**
-     * Returns the message carried by this data object.
-     * @return the message
-     */
-    public final String getMessage() {
-        return message;
-    }
-
-    /**
-     * Returns the default value carried by this data object.
-     * @return the default value
-     */
-    public final String getDefaultValue() {
-        return defaultValue;
-    }
-}
+public record PromptData(@NamedArg("message") String message, @NamedArg("defaultValue") String defaultValue) {}

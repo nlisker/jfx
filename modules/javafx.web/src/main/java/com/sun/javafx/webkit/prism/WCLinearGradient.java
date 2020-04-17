@@ -54,10 +54,10 @@ final class WCLinearGradient extends WCGradient<LinearGradient> {
     public LinearGradient getPlatformGradient() {
         Collections.sort(this.stops, WCRadialGradient.COMPARATOR);
         return new LinearGradient(
-                this.p1.getX(),
-                this.p1.getY(),
-                this.p2.getX(),
-                this.p2.getY(),
+                this.p1.x(),
+                this.p1.y(),
+                this.p2.x(),
+                this.p2.y(),
                 BaseTransform.IDENTITY_TRANSFORM,
                 isProportional(),
                 getSpreadMethod() - 1, // convert webkit to prism

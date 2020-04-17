@@ -85,7 +85,7 @@ public abstract class Gradient extends Paint {
     @Override
     public boolean isOpaque() {
         for (int i = 0; i < numStops; i++) {
-            if (!stops.get(i).getColor().isOpaque()) {
+            if (!stops.get(i).color().isOpaque()) {
                 return false;
             }
         }

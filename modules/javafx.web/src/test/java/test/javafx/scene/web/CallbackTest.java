@@ -303,8 +303,8 @@ public class CallbackTest extends TestBase {
 
         public final Callback<PromptData, String> prompt =
                 data -> {
-                    called(PROMPT, data.getMessage(), data.getDefaultValue());
-                    return data.getDefaultValue();
+                    called(PROMPT, data.message(), data.defaultValue());
+                    return data.defaultValue();
                 };
     }
 }

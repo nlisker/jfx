@@ -179,17 +179,18 @@ final class DateParser {
     /**
      * Container for parsed time.
      */
-    private static final class Time {
-        private final int hour;
-        private final int minute;
-        private final int second;
-
-        private Time(int hour, int minute, int second) {
-            this.hour = hour;
-            this.minute = minute;
-            this.second = second;
-        }
-    }
+//    private static final class Time {
+//        private final int hour;
+//        private final int minute;
+//        private final int second;
+//
+//        private Time(int hour, int minute, int second) {
+//            this.hour = hour;
+//            this.minute = minute;
+//            this.second = second;
+//        }
+//    }
+    private record Time(int hour, int minute, int second){};
 
     /**
      * Parses a token as a day of month.

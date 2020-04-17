@@ -1047,8 +1047,8 @@ final public class WebView extends Parent {
             text = ev.getCharacter();
         } else {
             KeyCodeMap.Entry keyCodeEntry = KeyCodeMap.lookup(ev.getCode());
-            keyIdentifier = keyCodeEntry.getKeyIdentifier();
-            windowsVirtualKeyCode = keyCodeEntry.getWindowsVirtualKeyCode();
+            keyIdentifier = keyCodeEntry.keyIdentifier();
+            windowsVirtualKeyCode = keyCodeEntry.windowsVirtualKeyCode();
         }
 
         WCKeyEvent keyEvent = new WCKeyEvent(

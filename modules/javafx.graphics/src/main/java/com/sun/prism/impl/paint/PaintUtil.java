@@ -51,8 +51,8 @@ public class PaintUtil {
         Color[] colors = new Color[numStops];
         for (int i = 0; i < numStops; i++) {
             Stop stop = mgrad.getStops().get(i);
-            fractions[i] = stop.getOffset();
-            colors[i] = stop.getColor();
+            fractions[i] = stop.offset();
+            colors[i] = stop.color();
         }
 
         MultipleGradientContext context;

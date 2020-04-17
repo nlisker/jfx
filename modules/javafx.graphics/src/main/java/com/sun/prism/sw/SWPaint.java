@@ -203,7 +203,7 @@ final class SWPaint {
         final int argb[] = new int[nstops];
         for (int i = 0; i < nstops; i++) {
             final Stop stop = grd.getStops().get(i);
-            final Color stopColor = stop.getColor();
+            final Color stopColor = stop.color();
             float alpha255 = 255 * stopColor.getAlpha() * compositeAlpha;
             argb[i] = ((((int)(alpha255)) & 0xFF) << 24) +
                     ((((int)(alpha255 * stopColor.getRed())) & 0xFF) << 16) +
@@ -218,7 +218,7 @@ final class SWPaint {
         final int fractions[] = new int[nstops];
         for (int i = 0; i < nstops; i++) {
             final Stop stop = grd.getStops().get(i);
-            fractions[i] = (int)(SWUtils.TO_PISCES * stop.getOffset());
+            fractions[i] = (int)(SWUtils.TO_PISCES * stop.offset());
         }
         return fractions;
     }

@@ -142,8 +142,8 @@ final class EventSender {
         }
         else {
             KeyCodeMap.Entry keyCodeEntry = KeyCodeMap.lookup(code);
-            String keyIdentifier = keyCodeEntry.getKeyIdentifier();
-            int windowsVirtualKeyCode = keyCodeEntry.getWindowsVirtualKeyCode();
+            String keyIdentifier = keyCodeEntry.keyIdentifier();
+            int windowsVirtualKeyCode = keyCodeEntry.windowsVirtualKeyCode();
             dispatchKeyEvent(WCKeyEvent.KEY_PRESSED, null, keyIdentifier,
                     windowsVirtualKeyCode, modifiers);
             dispatchKeyEvent(WCKeyEvent.KEY_TYPED, keyChar, null,

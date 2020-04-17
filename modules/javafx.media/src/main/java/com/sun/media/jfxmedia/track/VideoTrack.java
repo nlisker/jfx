@@ -65,12 +65,13 @@ public class VideoTrack extends Track
         if (frameSize == null) {
             throw new IllegalArgumentException("frameSize == null!");
         }
-        if (frameSize.width <= 0) {
-            throw new IllegalArgumentException("frameSize.width <= 0!");
-        }
-        if (frameSize.height <= 0) {
-            throw new IllegalArgumentException("frameSize.height <= 0!");
-        }
+//        These conditions can't occur because VideoResolution guarantees it
+//        if (frameSize.width() <= 0) {
+//            throw new IllegalArgumentException("frameSize.width <= 0!");
+//        }
+//        if (frameSize.height() <= 0) {
+//            throw new IllegalArgumentException("frameSize.height <= 0!");
+//        }
         // encodedFrameRate will be zero if it's unknown
         if (encodedFrameRate < 0.0F) {
             throw new IllegalArgumentException("encodedFrameRate < 0.0!");

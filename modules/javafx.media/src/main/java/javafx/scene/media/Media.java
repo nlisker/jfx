@@ -480,8 +480,8 @@ public final class Media {
                             com.sun.media.jfxmedia.track.VideoTrack vt =
                                     (com.sun.media.jfxmedia.track.VideoTrack) trackElement;
 
-                            int videoWidth = vt.getFrameSize().getWidth();
-                            int videoHeight = vt.getFrameSize().getHeight();
+                            int videoWidth = vt.getFrameSize().width();
+                            int videoHeight = vt.getFrameSize().height();
 
                             // FIXME: this isn't valid when there are multiple video tracks...
                             setWidth(videoWidth);

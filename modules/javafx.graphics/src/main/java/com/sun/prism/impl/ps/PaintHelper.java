@@ -176,7 +176,7 @@ class PaintHelper {
         for (int i = 0; i < MULTI_TEXTURE_SIZE; i++) {
             Color c;
             if (i < numStops) {
-                c = stops.get(i).getColor();
+                c = stops.get(i).color();
                 lastColor = c;
             } else {
                 // repeat the last color for the remaining slots so that
@@ -212,13 +212,13 @@ class PaintHelper {
     private static Color PINK = new Color(1.0f, 0.078431375f, 0.5764706f, 1.0f);
 
     private static void stopsToGtexImage(List<Stop> stops, int numStops) {
-        Color lastColor = stops.get(0).getColor();
-        float offset = stops.get(0).getOffset();
+        Color lastColor = stops.get(0).color();
+        float offset = stops.get(0).offset();
         int lastIndex = (int) (offset * (GTEX_CLR_TABLE_SIZE - 1) + 0.5f);
         insertInterpColor(gtexColors, 0, lastColor, lastColor, 0.0f);
         for (int i = 1; i < numStops; i++) {
-            Color color = stops.get(i).getColor();
-            offset = stops.get(i).getOffset();
+            Color color = stops.get(i).color();
+            offset = stops.get(i).offset();
             int index = (int) (offset * (GTEX_CLR_TABLE_SIZE - 1) + 0.5f);
             if (index == lastIndex) {
                 insertInterpColor(gtexColors, index, lastColor, color, 0.5f);
@@ -281,9 +281,9 @@ class PaintHelper {
         for (int i = 0; i < MULTI_MAX_FRACTIONS; i++) {
             // TODO: optimize this... (RT-27377)
             stopVals.put((i < numStops)   ?
-                         stops.get(i).getOffset() : 0f);
+                         stops.get(i).offset() : 0f);
             stopVals.put((i < numStops-1) ?
-                         1f / (stops.get(i+1).getOffset() - stops.get(i).getOffset()) : 0f);
+                         1f / (stops.get(i+1).offset() - stops.get(i).offset()) : 0f);
             stopVals.put(0f); // unused
             stopVals.put(0f); // unused
         }

@@ -150,8 +150,8 @@ public final class WebPageClientImpl implements WebPageClient<WebView> {
             (window = scene.getWindow()) != null)
         {
             Point2D pt = view.sceneToLocal(
-                    ptScreen.getX() - window.getX() - scene.getX(),
-                    ptScreen.getY() - window.getY() - scene.getY());
+                    ptScreen.x() - window.getX() - scene.getX(),
+                    ptScreen.y() - window.getY() - scene.getY());
             return new WCPoint((float)pt.getX(), (float)pt.getY());
         } else {
             return new WCPoint(0f, 0f);
@@ -166,7 +166,7 @@ public final class WebPageClientImpl implements WebPageClient<WebView> {
         if (scene != null &&
             (window = scene.getWindow()) != null)
         {
-            Point2D pt = view.localToScene(ptWindow.getX(), ptWindow.getY());
+            Point2D pt = view.localToScene(ptWindow.x(), ptWindow.y());
             return new WCPoint((float)(pt.getX() + scene.getX() + window.getX()),
                                (float)(pt.getY() + scene.getY() + window.getY()));
         } else {

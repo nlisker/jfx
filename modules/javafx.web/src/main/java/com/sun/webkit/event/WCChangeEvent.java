@@ -25,22 +25,31 @@
 
 package com.sun.webkit.event;
 
-public final class WCChangeEvent {
-    private final Object source;
+import java.util.Objects;
 
-    public WCChangeEvent(Object source) {
-        if (source == null) {
-            throw new IllegalArgumentException("null source");
-        }
-        this.source = source;
-    }
+//public final class WCChangeEvent {
+//    private final Object source;
+//
+//    public WCChangeEvent(Object source) {
+//        if (source == null) {
+//            throw new IllegalArgumentException("null source");
+//        }
+//        this.source = source;
+//    }
+//
+//    public Object getSource() {
+//        return source;
+//    }
+//
+//    @Override
+//    public String toString() {
+//        return getClass().getName() + "[source=" + source + "]";
+//    }
+//}
 
-    public Object getSource() {
-        return source;
-    }
+public record WCChangeEvent(Object source) {
 
-    @Override
-    public String toString() {
-        return getClass().getName() + "[source=" + source + "]";
+    public WCChangeEvent {
+        Objects.requireNonNull(source, "null source");
     }
 }

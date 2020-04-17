@@ -775,9 +775,9 @@ class WCGraphicsPrismContext extends WCGraphicsContext {
                 @Override void doPaint(Graphics g) {
                     // The handling of pattern transform is modeled after the WebKit
                     // ImageCG.cpp's Image::drawPattern()
-                    float adjustedX = phase.getX()
+                    float adjustedX = phase.x()
                             + srcRect.getX() * (float) patternTransform.getMatrix()[0];
-                    float adjustedY = phase.getY()
+                    float adjustedY = phase.y()
                             + srcRect.getY() * (float) patternTransform.getMatrix()[3];
                     float scaledTileWidth =
                             srcRect.getWidth() * (float) patternTransform.getMatrix()[0];
@@ -1081,7 +1081,7 @@ class WCGraphicsPrismContext extends WCGraphicsContext {
     @Override
     public void drawWidget(final RenderTheme theme, final Ref widget, final int x, final int y) {
         WCSize s = theme.getWidgetSize(widget);
-        if (!shouldRenderRect(x, y, s.getWidth(), s.getHeight(), null, null)) {
+        if (!shouldRenderRect(x, y, s.width(), s.height(), null, null)) {
             return;
         }
         new Composite() {
@@ -1100,7 +1100,7 @@ class WCGraphicsPrismContext extends WCGraphicsContext {
         }
 
         WCSize s = theme.getWidgetSize(widget);
-        if (!shouldRenderRect(x, y, s.getWidth(), s.getHeight(), null, null)) {
+        if (!shouldRenderRect(x, y, s.width(), s.height(), null, null)) {
             return;
         }
         new Composite() {

@@ -197,10 +197,10 @@ public class J2DPrismGraphics
             boolean needsFix = false;
             for (int i = 0; i < n; i++) {
                 Stop stop = stops.get(i);
-                float f = stop.getOffset();
+                float f = stop.offset();
                 needsFix = (needsFix || f <= prevf);
                 fractions[i] = prevf = f;
-                colors[i] = toJ2DColor(stop.getColor());
+                colors[i] = toJ2DColor(stop.color());
             }
             if (needsFix) {
                 n = fixFractions(fractions, colors);

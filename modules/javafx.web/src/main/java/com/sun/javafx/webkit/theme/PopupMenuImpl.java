@@ -114,6 +114,6 @@ public final class PopupMenuImpl extends com.sun.webkit.PopupMenu {
         WebPageClient<WebView> client = page.getPageClient();
         assert (client != null);
         WCPoint pt = client.windowToScreen(new WCPoint(anchorX, anchorY));
-        popup.show(client.getContainer().getScene().getWindow(), pt.getX(), pt.getY());
+        popup.show(client.getContainer().getScene().getWindow(), pt.x(), pt.y());
     }
 }

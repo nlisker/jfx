@@ -46,19 +46,27 @@ import static com.sun.javafx.fxml.expression.Operator.*;
 public abstract class Expression<T> {
     // Expression parser class
     private static class Parser {
-        public static class Token {
-            public Token(TokenType type, Object value) {
-                this.type = type;
-                this.value = value;
-            }
 
-            public final TokenType type;
-            public final Object value;
+//        public static class Token {
+//            public Token(TokenType type, Object value) {
+//                this.type = type;
+//                this.value = value;
+//            }
+//
+//            public final TokenType type;
+//            public final Object value;
+//
+//            @Override
+//            public String toString() {
+//                return value.toString();
+//            }
+//        }
+        private record Token(TokenType type, Object value) {
 
-            @Override
-            public String toString() {
-                return value.toString();
-            }
+          @Override
+          public String toString() {
+              return value.toString();
+          }
         }
 
         public enum TokenType {

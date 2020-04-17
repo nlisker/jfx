@@ -43,23 +43,25 @@ public final class KeyCodeMap {
     /**
      * The information associated with a {@code KeyCode}.
      */
-    public static final class Entry {
-        private final int windowsVirtualKeyCode;
-        private final String keyIdentifier;
+//    public static final class Entry {
+//        private final int windowsVirtualKeyCode;
+//        private final String keyIdentifier;
+//
+//        private Entry(int windowsVirtualKeyCode, String keyIdentifier) {
+//            this.windowsVirtualKeyCode = windowsVirtualKeyCode;
+//            this.keyIdentifier = keyIdentifier;
+//        }
+//
+//        public int getWindowsVirtualKeyCode() {
+//            return windowsVirtualKeyCode;
+//        }
+//
+//        public String getKeyIdentifier() {
+//            return keyIdentifier;
+//        }
+//    };
 
-        private Entry(int windowsVirtualKeyCode, String keyIdentifier) {
-            this.windowsVirtualKeyCode = windowsVirtualKeyCode;
-            this.keyIdentifier = keyIdentifier;
-        }
-
-        public int getWindowsVirtualKeyCode() {
-            return windowsVirtualKeyCode;
-        }
-
-        public String getKeyIdentifier() {
-            return keyIdentifier;
-        }
-    };
+    public record Entry(int windowsVirtualKeyCode, String keyIdentifier){}
 
     private static final Map<KeyCode, Entry> MAP = Map.ofEntries(
         entry(KeyCode.ENTER,             WCKeyEvent.VK_RETURN, "Enter"),
@@ -229,9 +231,9 @@ public final class KeyCodeMap {
      */
     public static Entry lookup(KeyCode keyCode) {
         Entry entry = MAP.get(keyCode);
-        if (entry == null || entry.getKeyIdentifier() == null) {
+        if (entry == null || entry.keyIdentifier() == null) {
             int windowsVirtualKeyCode = entry != null
-                    ? entry.getWindowsVirtualKeyCode() : 0;
+                    ? entry.windowsVirtualKeyCode() : 0;
             String keyIdentifier =
                     String.format("U+%04X", windowsVirtualKeyCode);
             entry = new Entry(windowsVirtualKeyCode, keyIdentifier);

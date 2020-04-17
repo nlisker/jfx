@@ -765,7 +765,7 @@ public final class WebPage {
                 log.fine("Focus event for a disposed web page.");
                 return;
             }
-            twkProcessFocusEvent(getPage(), fe.getID(), fe.getDirection());
+            twkProcessFocusEvent(getPage(), fe.id(), fe.direction());
 
         } finally {
             unlockPage();
@@ -784,11 +784,11 @@ public final class WebPage {
                 log.finest("filtered");
                 return false;
             }
-            return twkProcessKeyEvent(getPage(), ke.getType(), ke.getText(),
-                                      ke.getKeyIdentifier(),
-                                      ke.getWindowsVirtualKeyCode(),
-                                      ke.isShiftDown(), ke.isCtrlDown(),
-                                      ke.isAltDown(), ke.isMetaDown(), ke.getWhen() / 1000.0);
+            return twkProcessKeyEvent(getPage(), ke.type(), ke.text(),
+                                      ke.keyIdentifier(),
+                                      ke.windowsVirtualKeyCode(),
+                                      ke.shiftDown(), ke.ctrlDown(),
+                                      ke.altDown(), ke.metaDown(), ke.when() / 1000.0);
         } finally {
             unlockPage();
         }
@@ -797,7 +797,7 @@ public final class WebPage {
     public boolean dispatchMouseEvent(WCMouseEvent me) {
         lockPage();
         try {
-            log.finest("dispatchMouseEvent: " + me.getX() + "," + me.getY());
+            log.finest("dispatchMouseEvent: " + me.x() + "," + me.y());
             if (isDisposed) {
                 log.fine("Mouse event for a disposed web page.");
                 return false;
@@ -806,11 +806,11 @@ public final class WebPage {
             return !isDragConfirmed() //When Webkit informes FX about drag start, it waits
                                       //for system DnD loop and not intereasted in
                                       //intermediate mouse events that can change text selection.
-                && twkProcessMouseEvent(getPage(), me.getID(),
-                                        me.getButton(), me.getClickCount(),
-                                        me.getX(), me.getY(), me.getScreenX(), me.getScreenY(),
-                                        me.isShiftDown(), me.isControlDown(), me.isAltDown(), me.isMetaDown(), me.isPopupTrigger(),
-                                        me.getWhen() / 1000.0);
+                && twkProcessMouseEvent(getPage(), me.id(),
+                                        me.button(), me.clickCount(),
+                                        me.x(), me.y(), me.screenX(), me.screenY(),
+                                        me.shiftDown(), me.controlDown(), me.altDown(), me.metaDown(), me.popupTrigger(),
+                                        me.when() / 1000.0);
         } finally {
             unlockPage();
         }
@@ -825,10 +825,10 @@ public final class WebPage {
                 return false;
             }
             return twkProcessMouseWheelEvent(getPage(),
-                                             me.getX(), me.getY(), me.getScreenX(), me.getScreenY(),
-                                             me.getDeltaX(), me.getDeltaY(),
-                                             me.isShiftDown(), me.isControlDown(), me.isAltDown(), me.isMetaDown(),
-                                             me.getWhen() / 1000.0);
+                                             me.x(), me.y(), me.screenX(), me.screenY(),
+                                             me.deltaX(), me.deltaY(),
+                                             me.shiftDown(), me.controlDown(), me.altDown(), me.metaDown(),
+                                             me.when() / 1000.0);
         } finally {
             unlockPage();
         }
@@ -1596,7 +1596,7 @@ public final class WebPage {
             if (!frames.contains(frameID)) {
                 return;
             }
-            twkScrollToPosition(frameID, p.getIntX(), p.getIntY());
+            twkScrollToPosition(frameID, p.intX(), p.intY());
         } finally {
             unlockPage();
         }
