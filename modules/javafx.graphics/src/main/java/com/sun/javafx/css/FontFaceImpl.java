@@ -69,9 +69,9 @@ final public class FontFaceImpl extends FontFace {
         }
         sb.append("src : ");
         for(FontFaceSrc src: sources) {
-            sb.append(src.getType());
+            sb.append(src.type());
             sb.append(" \"");
-            sb.append(src.getSrc());
+            sb.append(src.src());
             sb.append("\", ");
         }
         sb.append("; ");
@@ -125,45 +125,73 @@ final public class FontFaceImpl extends FontFace {
         return new FontFaceImpl(descriptors, fontFaceSrcs);
     }
 
-    public static class FontFaceSrc {
-        private final FontFaceSrcType type;
-        private final String src;
-        private final String format;
+//    public static class FontFaceSrc {
+//        private final FontFaceSrcType type;
+//        private final String src;
+//        private final String format;
+//
+//        public FontFaceSrc(FontFaceSrcType type, String src, String format) {
+//            this.type = type;
+//            this.src = src;
+//            this.format = format;
+//        }
+//
+//        public FontFaceSrc(FontFaceSrcType type, String src) {
+//            this.type = type;
+//            this.src = src;
+//            this.format = null;
+//        }
+//
+//        public FontFaceSrcType getType() {
+//            return type;
+//        }
+//
+//        public String getSrc() {
+//            return src;
+//        }
+//
+//        public String getFormat() {
+//            return format;
+//        }
+//
+//        final void writeBinary(final DataOutputStream os, final StringStore stringStore) throws IOException
+//        {
+//            // ok if type, src or format are null since StringStore allows null
+//            os.writeInt(stringStore.addString(type.name()));
+//            os.writeInt(stringStore.addString(src));
+//            os.writeInt(stringStore.addString(format));
+//        }
+//
+//        final static FontFaceSrc readBinary(int bssVersion, DataInputStream is, String[] strings) throws IOException
+//        {
+//            int index = is.readInt();
+//            FontFaceSrcType type = (strings[index] != null) ? FontFaceSrcType.valueOf(strings[index]) : null;
+//
+//            index = is.readInt();
+//            String src = strings[index];
+//
+//            index = is.readInt();
+//            String format = strings[index];
+//
+//            return new FontFaceSrc(type, src, format);
+//
+//        }
+//    }
 
-        public FontFaceSrc(FontFaceSrcType type, String src, String format) {
-            this.type = type;
-            this.src = src;
-            this.format = format;
-        }
+    public record FontFaceSrc(FontFaceSrcType type, String src, String format) {
 
         public FontFaceSrc(FontFaceSrcType type, String src) {
-            this.type = type;
-            this.src = src;
-            this.format = null;
+            this(type, src, null);
         }
 
-        public FontFaceSrcType getType() {
-            return type;
-        }
-
-        public String getSrc() {
-            return src;
-        }
-
-        public String getFormat() {
-            return format;
-        }
-
-        final void writeBinary(final DataOutputStream os, final StringStore stringStore) throws IOException
-        {
+        final void writeBinary(final DataOutputStream os, final StringStore stringStore) throws IOException {
             // ok if type, src or format are null since StringStore allows null
             os.writeInt(stringStore.addString(type.name()));
             os.writeInt(stringStore.addString(src));
             os.writeInt(stringStore.addString(format));
         }
 
-        final static FontFaceSrc readBinary(int bssVersion, DataInputStream is, String[] strings) throws IOException
-        {
+        final static FontFaceSrc readBinary(int bssVersion, DataInputStream is, String[] strings) throws IOException {
             int index = is.readInt();
             FontFaceSrcType type = (strings[index] != null) ? FontFaceSrcType.valueOf(strings[index]) : null;
 
@@ -174,7 +202,6 @@ final public class FontFaceImpl extends FontFace {
             String format = strings[index];
 
             return new FontFaceSrc(type, src, format);
-
         }
     }
 }

@@ -1137,10 +1137,10 @@ final public class StyleManager {
                     faceLoop: for(FontFace fontFace: stylesheet.getFontFaces()) {
                         if (fontFace instanceof FontFaceImpl) {
                             for(FontFaceImpl.FontFaceSrc src: ((FontFaceImpl)fontFace).getSources()) {
-                                if (src.getType() == FontFaceImpl.FontFaceSrcType.URL) {
-                                    Font loadedFont = Font.loadFont(src.getSrc(),10);
+                                if (src.type() == FontFaceImpl.FontFaceSrcType.URL) {
+                                    Font loadedFont = Font.loadFont(src.src(),10);
                                     if (loadedFont == null) {
-                                        getLogger().info("Could not load @font-face font [" + src.getSrc() + "]");
+                                        getLogger().info("Could not load @font-face font [" + src.src() + "]");
                                     }
                                     continue faceLoop;
                                 }

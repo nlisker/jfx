@@ -267,18 +267,18 @@ public class CssParserTest {
 
         for(int n=0; n<nFontFaceSrcs; n++) {
             FontFaceImpl.FontFaceSrc fontFaceSrc = fontFaceSrcs.get(n);
-            FontFaceImpl.FontFaceSrcType type = fontFaceSrc.getType();
+            FontFaceImpl.FontFaceSrcType type = fontFaceSrc.type();
             switch(type) {
                 case LOCAL: {
-                    String src = fontFaceSrc.getSrc();
+                    String src = fontFaceSrc.src();
                     assertTrue("Bree Serif".equals(src) || "BreeSerif-Regular".equals(src));
-                    assertNull(fontFaceSrc.getFormat());
+                    assertNull(fontFaceSrc.format());
                     break;
                 }
                 case URL: {
-                    String src = fontFaceSrc.getSrc();
+                    String src = fontFaceSrc.src();
                     assertEquals(src, "http://themes.googleusercontent.com/static/fonts/breeserif/v2/LQ7WLTaITDg4OSRuOZCps73hpw3pgy2gAi-Ip7WPMi0.woff");
-                    assertEquals(fontFaceSrc.getFormat(), "woff");
+                    assertEquals(fontFaceSrc.format(), "woff");
                     break;
                 }
                 case REFERENCE:
