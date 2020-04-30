@@ -23,30 +23,28 @@
  * questions.
  */
 
-struct ObjectPsIn {
-    float2  texD    : texcoord0;
-    float4  ambient : texcoord1;
+struct PsInput {
+    float2 texD    : TEXCOORD0;
+    float4 ambient : TEXCOORD1;
 };
 
 struct LocalBump {
 
-    static const float nLights = 3;
+    static const float nLights = 10;
 
-    float3  eye             : texcoord2;
-    float4  lights[nLights] : texcoord3; // 3, 4,5 [6]
-    float3  debug           : texcoord7;
+    float3 eye                : TEXCOORD2;
+    float4 lightsDir[nLights] : TEXCOORD3; // 3, ... 14
+    float3 debug              : TEXCOORD15;
 };
 
 struct LocalBumpOut {
-    float4  pos  : position;
-    float   oFog  : fog;
+    float4 pos  : POSITION0;
+    float  oFog : FOG;
 
     LocalBump lBump;
 };
 
-
-struct ObjVsOutput {
+struct VsOutput {
+    PsInput psInput;
     LocalBumpOut light;
-    ObjectPsIn   objAttr;
 };
-

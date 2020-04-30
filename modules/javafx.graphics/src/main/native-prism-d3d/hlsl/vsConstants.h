@@ -34,19 +34,23 @@ static const int MAX_BONES = 70;
 static const int isSkinned = Skin;
 
 struct Light {
-    float4 pos;
+    float4 worldPos;
     float4 color;
 };
 
+// m = matrix
+// s = struct
+// g = vector
+
 // camera
 float4x4    mViewProj   : register (c0);
-float4      gCameraPos  : register(c4);
+float4      gCameraWorldPos  : register(c4);
 
 
 float4      gReserved5[5] : register(c5);
 
 // lighting
-Light       sLights[5]   : register(c10);
+Light       sLights[10]   : register(c10);
 float4      gAmbinet         : register (c20);
 float4      gAmbinetData[10] : register (c20);
 

@@ -27,9 +27,8 @@
 
 // NVertex<1>, SkinVertex
 
-struct ObjVertex {
-    float4  Pos       : position;
-
-    float2  TexD      : texcoord0;
-    float4  Tangent   : texcoord1;
+struct VsInput {
+    float4  modelPos     : position;
+    float2  texD         : texcoord0;
+    float4  modelTangent : texcoord1;
 };

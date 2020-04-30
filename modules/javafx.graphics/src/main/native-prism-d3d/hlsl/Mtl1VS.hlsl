@@ -29,16 +29,13 @@
 
 float2 transformTexture(float2 t) { return t; }
 
-ObjVsOutput main(VertexType i) {
-    ObjVsOutput o;
+VsOutput main(VsInput i) {
+    VsOutput output;
 
-    float4 _tangent = i.Tangent;
-    float4 _pos = i.Pos;
+    calcLocalBump(i.modelPos, i.modelTangent, mWorld, output.light);
 
-    calcLocalBump(_pos, _tangent, mWorld, o.light);
+    output.psInput.ambient = gAmbinet;
+    output.psInput.texD = transformTexture(i.texD);
 
-    o.objAttr.ambient = gAmbinet;
-    o.objAttr.texD = transformTexture(i.TexD);
-
-    return o;
+    return output;
 }

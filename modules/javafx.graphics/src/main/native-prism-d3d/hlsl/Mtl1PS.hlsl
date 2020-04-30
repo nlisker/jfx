@@ -46,27 +46,27 @@ float4 debug() {
     return float4(0,0,1,1);
 }
 
-float4 main(ObjectPsIn objAttr, LocalBump  lSpace) : color {
+float4 main(PsInput psInput, LocalBump lBump) : COLOR {
 
     if (0) return debug();
-    // return retNormal(lSpace.debug);
+    // return retNormal(lBump.debug);
 
-    float4 tDiff = tex2D(mapDiffuse, objAttr.texD);
+    float4 tDiff = tex2D(mapDiffuse, psInput.texD);
     if (tDiff.a == 0.0) discard;
     tDiff = tDiff * gDiffuseColor;
 
     // return gDiffuseColor.aaaa;
 
-    float3 nEye = normalize(lSpace.eye);
+    float3 nEye = normalize(lBump.eye);
 
     float3 n = float3(0,0,1);
 
     if (bump) {
-        float4 BumpSpec = tex2D(mapBumpHeight, objAttr.texD);
-        n = normalize(BumpSpec.xyz*2-1);
+        float4 BumpSpec = tex2D(mapBumpHeight, psInput.texD);
+        n = normalize(BumpSpec.xyz * 2 - 1);
     }
 
-    float4 ambColor = objAttr.ambient;
+    float4 ambColor = psInput.ambient;
 
     float4 tSpec = float4(0,0,0,0);
     float sPower = 0;
@@ -74,7 +74,7 @@ float4 main(ObjectPsIn objAttr, LocalBump  lSpace) : color {
     if ( specType > 0 ) {
         sPower = gSpecularColor.a;
         if (specType != SpecColor) { // Texture or Mix
-            tSpec = tex2D(mapSpecular, objAttr.texD);
+            tSpec = tex2D(mapSpecular, psInput.texD);
             sPower *= NTSC_Gray(tSpec.rgb);
         } else { // Color
             tSpec.rgb = gSpecularColor.rgb;
@@ -88,12 +88,12 @@ float4 main(ObjectPsIn objAttr, LocalBump  lSpace) : color {
     float3 diff = 0;
     float3 spec = 0;
 
-    phong(n, nEye, sPower, lSpace.lights, diff, spec, 0, nSpecular);
+    phong(n, nEye, sPower, lBump.lightsDir, diff, spec, 0, nSpecular);
 
-    float3 rez = (ambColor.xyz+diff)*tDiff.xyz + spec*tSpec.rgb;
+    float3 rez = (ambColor.xyz + diff) * tDiff.xyz + spec * tSpec.rgb;
 
     if (isIlluminated)
-        rez += tex2D(mapSelfIllum, objAttr.texD).xyz;
+        rez += tex2D(mapSelfIllum, psInput.texD).xyz;
 
-    return float4( saturate(rez), tDiff.a);
+    return float4(saturate(rez), tDiff.a);
 }

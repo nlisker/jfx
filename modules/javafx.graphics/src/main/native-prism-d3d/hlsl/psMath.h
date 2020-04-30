@@ -50,13 +50,13 @@ float NTSC_Gray(float3 color) {
     return dot(color, float3(0.299, 0.587, 0.114));
 }
 
-float3 getBumpNormal(float3 bumpMap, float3 N[3]) {
-    return bumpMap.z*N[0]+bumpMap.x*N[1]+bumpMap.y*N[2];
-}
+//float3 getBumpNormal(float3 bumpMap, float3 N[3]) {
+//    return bumpMap.z * N[0] + bumpMap.x * N[1] + bumpMap.y * N[2];
+//}
 
-float4 retNormal(float3 n) { return float4( n*0.5+0.5,1); }
+// float4 retNormal(float3 n) { return float4(n * 0.5 + 0.5,1); }
 
-float4 retr(float x) { return float4(x.xxx,1); }
+// float4 retr(float x) { return float4(x.xxx,1); }
 
 void phong(
     float3 n, float3 e, float power, in float4 L[LocalBump::nLights],
@@ -65,7 +65,7 @@ void phong(
     float3 refl = reflect(e, n);
     for (int i=_s; i<_e; i++) {
         float3 l = normalize(L[i].xyz);
-        d += saturate(dot(n,l))*gLightColor[i].xyz;
-        s += pow(saturate(dot(-refl, l)), power)*gLightColor[i].xyz;
+        d += saturate(dot(n, l)) * gLightColor[i].xyz;
+        s += pow(saturate(dot(-refl, l)), power) * gLightColor[i].xyz;
     }
 }

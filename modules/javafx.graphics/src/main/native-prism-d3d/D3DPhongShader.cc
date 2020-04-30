@@ -95,10 +95,10 @@ D3DPhongShader::D3DPhongShader(IDirect3DDevice9 *dev) {
     pixelShader0 = createPixelShader(device, psMtl1);
     pixelShader0_si = createPixelShader(device, psMtl1_i);
 
-    for (int siType=0; siType!=SelfIlllumTotal; ++siType) {
-        for (int bType=0; bType!=BumpTotal; ++bType) {
-            for (int sType=0; sType!=SpecTotal; ++sType) {
-                for (int i=0; i!=maxLights; ++i) {
+    for (int siType = 0; siType != SelfIlllumTotal; ++siType) {
+        for (int bType = 0; bType != BumpTotal; ++bType) {
+            for (int sType = 0; sType != SpecTotal; ++sType) {
+                for (int i = 0; i != maxLights; ++i) {
                     pixelShaders[siType][bType][sType][i] =
                             createPixelShader(dev, sFuncArr[siType][bType][sType][i]);
                 }
