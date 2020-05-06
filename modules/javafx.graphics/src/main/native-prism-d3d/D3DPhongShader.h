@@ -30,18 +30,20 @@
 #define VSR_VIEWPROJMATRIX  0  // 4 total
 #define VSR_CAMERAPOS 4        // 1 total
 // lighting
-// 5 lights (3 in use, 2 reserved)
-// with 2 registers = 10 registers
+// number of lights used out of max lights
+#define VSR_NUM_LIGHTS 5
+// 5 lights with 2 registers (pos + color) = 10 registers
 #define VSR_LIGHTS 10
 // 8 ambient points + 2 coords : 10 registers
-#define VSR_AMBIENTCOLOR 20
+#define VSR_AMBIENTCOLOR 30
 // world
-#define VSR_WORLDMATRIX 30
+#define VSR_WORLDMATRIX 40
 
 // PSR implies Pixel Shader Registers
 // we have 32 constants for ps 2.0
 #define PSR_DIFFUSECOLOR 0
 #define PSR_SPECULARCOLOR 1
+#define PSR_NUM_LIGHTS 3
 #define PSR_LIGHTCOLOR 4
 
 // SR implies Sampler Registers
@@ -64,28 +66,35 @@ enum BumpType {
     BumpTotal
 };
 
+// i = self illum
+// n = SpecNone
+// t = SpecTexture
+// c = SpecColor
+// m = SpecMix
+// s = BumpNone
+// b = BumpSpecified
 typedef const DWORD * ShaderFunction;
 ShaderFunction vsMtl1_Obj();
 ShaderFunction psMtl1(), psMtl1_i(),
-psMtl1_s1n(), psMtl1_s2n(), psMtl1_s3n(),
-psMtl1_s1t(), psMtl1_s2t(), psMtl1_s3t(),
-psMtl1_s1c(), psMtl1_s2c(), psMtl1_s3c(),
-psMtl1_s1m(), psMtl1_s2m(), psMtl1_s3m(),
+psMtl1_sn(),
+psMtl1_st(),
+psMtl1_sc(),
+psMtl1_sm(),
 
-psMtl1_b1n(), psMtl1_b2n(), psMtl1_b3n(),
-psMtl1_b1t(), psMtl1_b2t(), psMtl1_b3t(),
-psMtl1_b1c(), psMtl1_b2c(), psMtl1_b3c(),
-psMtl1_b1m(), psMtl1_b2m(), psMtl1_b3m(),
+psMtl1_bn(),
+psMtl1_bt(),
+psMtl1_bc(),
+psMtl1_bm(),
 
-psMtl1_s1ni(), psMtl1_s2ni(), psMtl1_s3ni(),
-psMtl1_s1ti(), psMtl1_s2ti(), psMtl1_s3ti(),
-psMtl1_s1ci(), psMtl1_s2ci(), psMtl1_s3ci(),
-psMtl1_s1mi(), psMtl1_s2mi(), psMtl1_s3mi(),
+psMtl1_sni(),
+psMtl1_sti(),
+psMtl1_sci(),
+psMtl1_smi(),
 
-psMtl1_b1ni(), psMtl1_b2ni(), psMtl1_b3ni(),
-psMtl1_b1ti(), psMtl1_b2ti(), psMtl1_b3ti(),
-psMtl1_b1ci(), psMtl1_b2ci(), psMtl1_b3ci(),
-psMtl1_b1mi(), psMtl1_b2mi(), psMtl1_b3mi();
+psMtl1_bni(),
+psMtl1_bti(),
+psMtl1_bci(),
+psMtl1_bmi();
 
 class D3DPhongShader {
 public:
@@ -97,14 +106,13 @@ public:
     HRESULT setPixelShader(int numLights, int specularMode, int bumpMode, int selfIllumMode);
 
 static const int SelfIlllumTotal = 2;
-static const int maxLights = 3;
+static const int maxLights = 5;
 
 private:
     IDirect3DDevice9 *device;
     IDirect3DVertexShader9 *vertexShader;
     IDirect3DPixelShader9 *pixelShader0, *pixelShader0_si;
-    IDirect3DPixelShader9 *pixelShaders[SelfIlllumTotal][BumpTotal][SpecTotal][maxLights];
+    IDirect3DPixelShader9 *pixelShaders[SelfIlllumTotal][BumpTotal][SpecTotal]/*[maxLights]*/; // 2 * 2 * 4
 };
 
 #endif  /* D3DPHONGSHADER_H */
-

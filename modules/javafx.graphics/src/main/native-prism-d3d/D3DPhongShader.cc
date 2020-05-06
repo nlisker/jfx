@@ -50,9 +50,9 @@ D3DPhongShader::~D3DPhongShader() {
     for (int siType = 0; siType != SelfIlllumTotal; ++siType) {
         for (int bType = 0; bType != BumpTotal; ++bType) {
             for (int sType = 0; sType != SpecTotal; ++sType) {
-                for (int i = 0; i != maxLights; ++i) {
-                    pixelShaders[siType][bType][sType][i]->Release();
-                }
+//                for (int i = 0; i != maxLights; ++i) {
+                pixelShaders[siType][bType][sType]/*[i]*/->Release();
+//                }
             }
         }
     }
@@ -62,32 +62,32 @@ D3DPhongShader::~D3DPhongShader() {
 D3DPhongShader::D3DPhongShader(IDirect3DDevice9 *dev) {
     device = dev;
 
-    static ShaderFunction(* const sFuncArr[SelfIlllumTotal][BumpTotal][SpecTotal][maxLights])() = {
+    static ShaderFunction(* const sFuncArr[SelfIlllumTotal][BumpTotal][SpecTotal]/*[maxLights]*/)() = {
         {
             {
-                { psMtl1_s1n, psMtl1_s2n, psMtl1_s3n},
-                { psMtl1_s1t, psMtl1_s2t, psMtl1_s3t},
-                { psMtl1_s1c, psMtl1_s2c, psMtl1_s3c},
-                { psMtl1_s1m, psMtl1_s2m, psMtl1_s3m}
+                psMtl1_sn,
+                psMtl1_st,
+                psMtl1_sc,
+                psMtl1_sm
             },
             {
-                { psMtl1_b1n, psMtl1_b2n, psMtl1_b3n},
-                { psMtl1_b1t, psMtl1_b2t, psMtl1_b3t},
-                { psMtl1_b1c, psMtl1_b2c, psMtl1_b3c},
-                { psMtl1_b1m, psMtl1_b2m, psMtl1_b3m}
+                psMtl1_bn,
+                psMtl1_bt,
+                psMtl1_bc,
+                psMtl1_bm
             }},
         {
             {
-                { psMtl1_s1ni, psMtl1_s2ni, psMtl1_s3ni},
-                { psMtl1_s1ti, psMtl1_s2ti, psMtl1_s3ti},
-                { psMtl1_s1ci, psMtl1_s2ci, psMtl1_s3ci},
-                { psMtl1_s1mi, psMtl1_s2mi, psMtl1_s3mi}
+                psMtl1_sni,
+                psMtl1_sti,
+                psMtl1_sci,
+                psMtl1_smi
             },
             {
-                { psMtl1_b1ni, psMtl1_b2ni, psMtl1_b3ni},
-                { psMtl1_b1ti, psMtl1_b2ti, psMtl1_b3ti},
-                { psMtl1_b1ci, psMtl1_b2ci, psMtl1_b3ci},
-                { psMtl1_b1mi, psMtl1_b2mi, psMtl1_b3mi}
+                psMtl1_bni,
+                psMtl1_bti,
+                psMtl1_bci,
+                psMtl1_bmi
             }}
     };
 
@@ -98,10 +98,9 @@ D3DPhongShader::D3DPhongShader(IDirect3DDevice9 *dev) {
     for (int siType = 0; siType != SelfIlllumTotal; ++siType) {
         for (int bType = 0; bType != BumpTotal; ++bType) {
             for (int sType = 0; sType != SpecTotal; ++sType) {
-                for (int i = 0; i != maxLights; ++i) {
-                    pixelShaders[siType][bType][sType][i] =
-                            createPixelShader(dev, sFuncArr[siType][bType][sType][i]);
-                }
+//                for (int i = 0; i != maxLights; ++i) {
+                pixelShaders[siType][bType][sType]/*[i]*/ = createPixelShader(dev, sFuncArr[siType][bType][sType]/*[i]*/);
+//                }
             }
         }
     }
@@ -136,7 +135,7 @@ HRESULT D3DPhongShader::setPixelShader(int numLights, int specularMode,
     if (numLights == 0) {
         pshd = selfIllumMode ? pixelShader0_si : pixelShader0;
     } else {
-        pshd = pixelShaders[selfIllumMode][bumpMode][specularMode][numLights - 1];
+        pshd = pixelShaders[selfIllumMode][bumpMode][specularMode]/*[numLights - 1]*/;
     }
 
     return SUCCEEDED(device->SetPixelShader(pshd));

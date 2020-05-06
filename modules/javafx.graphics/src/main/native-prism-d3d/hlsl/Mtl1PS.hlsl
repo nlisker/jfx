@@ -88,7 +88,7 @@ float4 main(PsInput psInput, LocalBump lBump) : COLOR {
     float3 diff = 0;
     float3 spec = 0;
 
-    phong(n, nEye, sPower, lBump.lightsDir, diff, spec, 0, nSpecular);
+    phong(n, nEye, sPower, lBump.lightsDir, diff, spec, 0, 5);
 
     float3 rez = (ambColor.xyz + diff) * tDiff.xyz + spec * tSpec.rgb;
 

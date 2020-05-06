@@ -46,16 +46,16 @@ struct Light {
 float4x4    mViewProj   : register (c0);
 float4      gCameraWorldPos  : register(c4);
 
-
-float4      gReserved5[5] : register(c5);
+float4      gReserved5[4] : register(c6);
 
 // lighting
-Light       sLights[10]   : register(c10);
-float4      gAmbinet         : register (c20);
-float4      gAmbinetData[10] : register (c20);
+int4        numLights : register(c5);
+Light       sLights[5]   : register(c10);
+float4      gAmbinet         : register (c30);
+float4      gAmbinetData[10] : register (c30);
 
 // world
-float4x3    mWorld                : register (c30);
-float4x3    mBones[MAX_BONES]     : register (c30);
+float4x3    mWorld                : register (c40);
+float4x3    mBones[MAX_BONES]     : register (c40);
 
 float4      gReserved240[16] : register(c240);

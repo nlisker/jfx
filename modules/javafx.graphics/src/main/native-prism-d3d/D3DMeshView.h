@@ -44,11 +44,13 @@ public:
     void computeNumLights();
     void render();
 
+    static const int MAX_LIGHTS = 5;
+
 private:
     D3DContext *context;
     D3DMesh *mesh;
     D3DPhongMaterial *material;
-    D3DLight lights[3];
+    D3DLight lights[MAX_LIGHTS];
     float ambientLightColor[3];
     int  numLights;
     bool lightsDirty;
@@ -57,4 +59,3 @@ private:
 };
 
 #endif  /* D3DMESHVIEW_H */
-

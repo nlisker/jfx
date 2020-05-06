@@ -368,6 +368,8 @@ class D3DContext extends BaseShaderContext {
         return nGetFrameStats(pContext, result, reset) ? result : null;
     }
 
+    public static native int nGetMaxNumLights();
+
     /*
      * @param depthBuffer if true will create and attach a depthBuffer,
      * if needed, of the same format as the render target. The depth test state

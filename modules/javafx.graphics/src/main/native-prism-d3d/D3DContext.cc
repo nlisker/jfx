@@ -495,6 +495,19 @@ JNIEXPORT void JNICALL Java_com_sun_prism_d3d_D3DContext_nSetWireframe
 
 /*
  * Class:     com_sun_prism_d3d_D3DContext
+ * Method:    nGetMaxNumLights
+ * Signature: (V)V
+ */
+JNIEXPORT jint JNICALL Java_com_sun_prism_d3d_D3DContext_nGetMaxNumLights
+  (JNIEnv *env, jclass)
+{
+    TraceLn(NWT_TRACE_INFO, "D3DContext_nGetMaxNumLights");
+
+    return D3DMeshView::MAX_LIGHTS;
+}
+
+/*
+ * Class:     com_sun_prism_d3d_D3DContext
  * Method:    nSetAmbientLight
  * Signature: (JJFFF)V
  */

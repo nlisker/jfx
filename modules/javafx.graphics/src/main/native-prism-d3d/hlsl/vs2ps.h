@@ -30,15 +30,15 @@ struct PsInput {
 
 struct LocalBump {
 
-    static const float nLights = 10;
+    static const float nLights = 5;
 
     float3 eye                : TEXCOORD2;
-    float4 lightsDir[nLights] : TEXCOORD3; // 3, ... 14
-    float3 debug              : TEXCOORD15;
+    float4 lightsDir[nLights] : TEXCOORD3; // 3, ... 8
+    float3 debug              : TEXCOORD8;
 };
 
 struct LocalBumpOut {
-    float4 pos  : POSITION0;
+    float4 pos  : POSITION;
     float  oFog : FOG;
 
     LocalBump lBump;

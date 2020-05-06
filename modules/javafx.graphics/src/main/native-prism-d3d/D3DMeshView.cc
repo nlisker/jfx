@@ -37,7 +37,6 @@ D3DMeshView::~D3DMeshView() {
     // The freeing of native resources is handled by its Java layer.
     mesh = NULL;
     material = NULL;
-
 }
 
 D3DMeshView::D3DMeshView(D3DContext *ctx, D3DMesh *pMesh) {
@@ -48,7 +47,7 @@ D3DMeshView::D3DMeshView(D3DContext *ctx, D3DMesh *pMesh) {
     ambientLightColor[1] = 0;
     ambientLightColor[2] = 0;
     numLights = 0;
-    ZeroMemory(lights, sizeof(D3DLight) * 3);
+    ZeroMemory(lights, sizeof(D3DLight) * MAX_LIGHTS);
     lightsDirty = TRUE;
     cullMode = D3DCULL_NONE;
     wireframe = FALSE;
@@ -75,7 +74,7 @@ void D3DMeshView::setAmbientLight(float r, float g, float b) {
 void D3DMeshView::setPointLight(int index, float x, float y, float z,
     float r, float g, float b, float w) {
     // NOTE: We only support up to 3 point lights at the present
-    if (index >= 0 && index <= 2) {
+    if (index >= 0 && index <= MAX_LIGHTS) {
         lights[index].position[0] = x;
         lights[index].position[1] = y;
         lights[index].position[2] = z;
@@ -93,15 +92,15 @@ void D3DMeshView::computeNumLights() {
     lightsDirty = false;
 
     int n = 0;
-    for (int i = 0; i != 3; ++i)
+    for (int i = 0; i != MAX_LIGHTS; ++i)
         n += lights[i].w ? 1 : 0;
 
     numLights = n;
 }
 
 inline void matrixTransposed(D3DMATRIX& r, const D3DMATRIX& a) {
-    for (int i=0; i<4; i++) {
-        for (int j=0; j<4; j++) {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
             r.m[j][i] = a.m[i][j];
         }
     }
@@ -131,9 +130,13 @@ void D3DMeshView::render() {
     }
 
     computeNumLights();
-    // We only support up to 3 point lights at the present
-    for (int i = 0; i < 3; i++) {
-        status = SUCCEEDED(device->SetVertexShaderConstantF(VSR_LIGHTS + i*2, lights[i].position, 1));
+    int nl[4];
+    nl[0] = numLights;
+    status = SUCCEEDED(device->SetVertexShaderConstantI(VSR_NUM_LIGHTS, nl, 1));
+    status = SUCCEEDED(device->SetPixelShaderConstantI(PSR_NUM_LIGHTS, nl, 1));
+
+    for (int i = 0; i < numLights; i++) {
+        status = SUCCEEDED(device->SetVertexShaderConstantF(VSR_LIGHTS + i * 2, lights[i].position, 1)); // 2 components in each light
     }
 
     status = SUCCEEDED(device->SetVertexShaderConstantF(VSR_AMBIENTCOLOR, ambientLightColor, 1));
@@ -154,15 +157,14 @@ void D3DMeshView::render() {
         return;
     }
 
-    float lightsColor[12];
-    for (int i = 0, j = 0; i < 3; i++) {
-        float w = lights[i].w;
-        lightsColor[j++] = lights[i].color[0] * w;
-        lightsColor[j++] = lights[i].color[1] * w;
-        lightsColor[j++] = lights[i].color[2] * w;
+    float lightsColor[MAX_LIGHTS * 4];
+    for (int i = 0, j = 0; i < numLights; i++) {
+        lightsColor[j++] = lights[i].color[0];
+        lightsColor[j++] = lights[i].color[1];
+        lightsColor[j++] = lights[i].color[2];
         lightsColor[j++] = 1;
     }
-    status = SUCCEEDED(device->SetPixelShaderConstantF(PSR_LIGHTCOLOR, lightsColor, 3));
+    status = SUCCEEDED(device->SetPixelShaderConstantF(PSR_LIGHTCOLOR, lightsColor, MAX_LIGHTS));
     if (!status) {
         cout << "D3DMeshView.render() - SetPixelShaderConstantF (PSR_LIGHTCOLOR) failed !!!" << endl;
         return;

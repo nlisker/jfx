@@ -28,9 +28,9 @@
 #include "psConstants.h"
 #include "vs2ps.h"
 
-#ifndef Spec
-    #define Spec 0
-#endif
+//#ifndef Spec
+//    #define Spec 0
+//#endif
 
 #ifndef Bump
     #define Bump 0
@@ -42,7 +42,7 @@
 
 
 static const bool bump = Bump;
-static const int nSpecular = Spec;
+//static const int nSpecular = Spec;
 static const bool isIlluminated = IllumMap;
 
 

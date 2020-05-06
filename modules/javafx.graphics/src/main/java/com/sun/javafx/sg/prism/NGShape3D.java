@@ -31,6 +31,7 @@ import javafx.scene.shape.CullFace;
 import javafx.scene.shape.DrawMode;
 import com.sun.javafx.geom.Vec3d;
 import com.sun.javafx.geom.transform.Affine3D;
+import com.sun.javafx.util.Utils;
 import com.sun.prism.Graphics;
 import com.sun.prism.Material;
 import com.sun.prism.MeshView;
@@ -40,6 +41,12 @@ import com.sun.prism.ResourceFactory;
  * TODO: 3D - Need documentation
  */
 public abstract class NGShape3D extends NGNode {
+
+    /*
+     * Maximum number of lights allowed by the d3d pipeline.
+     */
+    private static final int MAX_LIGHTS = 5;
+
     private NGPhongMaterial material;
     private DrawMode drawMode;
     private CullFace cullFace;
@@ -70,7 +77,6 @@ public abstract class NGShape3D extends NGNode {
     }
 
     private void renderMeshView(Graphics g) {
-
         //validate state
         g.setup3DRendering();
 
@@ -107,23 +113,17 @@ public abstract class NGShape3D extends NGNode {
 
         // Setup lights
         int pointLightIdx = 0;
-        if (g.getLights() == null || g.getLights()[0] == null) {
-            // If no lights are in scene apply default light. Default light
-            // is a single point white point light at camera eye position.
-            meshView.setAmbientLight(0.0f, 0.0f, 0.0f);
-            Vec3d cameraPos = g.getCameraNoClone().getPositionInWorld(null);
-            meshView.setPointLight(pointLightIdx++,
-                                   (float)cameraPos.x,
-                                   (float)cameraPos.y,
-                                   (float)cameraPos.z,
-                                   1.0f, 1.0f, 1.0f, 1.0f);
+        NGLightBase[] lights = g.getLights();
+        if (noLights(lights)) {
+            createDefaultLight(g);
+            pointLightIdx++;
         } else {
             float ambientRed = 0.0f;
             float ambientBlue = 0.0f;
             float ambientGreen = 0.0f;
 
-            for (int i = 0; i < g.getLights().length; i++) {
-                NGLightBase lightBase = g.getLights()[i];
+            for (int i = 0; i < lights.length; i++) {
+                NGLightBase lightBase = lights[i];
                 if (lightBase == null) {
                     // The array of lights can have nulls
                     break;
@@ -149,12 +149,13 @@ public abstract class NGShape3D extends NGNode {
 //                    intensity *= attenuationFactor;
                     if (lightBase instanceof NGPointLight) {
                         NGPointLight light = (NGPointLight)lightBase;
+                        if (pointLightIdx >= MAX_LIGHTS) {
+                            continue;
+                        }
                         if (rL != 0.0f || gL != 0.0f || bL != 0.0f) {
                             Affine3D lightWT = light.getWorldTransform();
                             meshView.setPointLight(pointLightIdx++,
-                                    (float)lightWT.getMxt(),
-                                    (float)lightWT.getMyt(),
-                                    (float)lightWT.getMzt(),
+                                    (float) lightWT.getMxt(), (float) lightWT.getMyt(), (float) lightWT.getMzt(),
                                     rL, gL, bL, 1.0f);
                         }
                     } else if (lightBase instanceof NGAmbientLight) {
@@ -165,13 +166,14 @@ public abstract class NGShape3D extends NGNode {
                     }
                 }
             }
-            ambientRed = saturate(ambientRed);
-            ambientGreen = saturate(ambientGreen);
-            ambientBlue = saturate(ambientBlue);
+            ambientRed = Utils.clamp(0, ambientRed, 1);
+            ambientGreen = Utils.clamp(0, ambientGreen, 1);
+            ambientBlue = Utils.clamp(0, ambientBlue, 1);
             meshView.setAmbientLight(ambientRed, ambientGreen, ambientBlue);
         }
+        System.out.println("pointLightIdx " + pointLightIdx);
         // TODO: 3D Required for D3D implementation of lights, which is limited to 3
-        while (pointLightIdx < 3) {
+        while (pointLightIdx < MAX_LIGHTS) {
                 // Reset any previously set lights
                 meshView.setPointLight(pointLightIdx++, 0, 0, 0, 0, 0, 0, 0);
         }
@@ -179,9 +181,19 @@ public abstract class NGShape3D extends NGNode {
         meshView.render(g);
     }
 
-    // Clamp between [0, 1]
-    private static float saturate(float value) {
-        return value < 1.0f ? ((value < 0.0f) ? 0.0f : value) : 1.0f;
+    /**
+     * If no lights are in scene apply default light. Default light
+     * is a single point white point light at camera eye position.
+     */
+    private void createDefaultLight(Graphics g) {
+        meshView.setAmbientLight(0.0f, 0.0f, 0.0f);
+        Vec3d cameraPos = g.getCameraNoClone().getPositionInWorld(null);
+        meshView.setPointLight(0, (float) cameraPos.x, (float) cameraPos.y, (float) cameraPos.z,
+                1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
+    private boolean noLights(NGLightBase[] lights) {
+        return lights == null || lights[0] == null;
     }
 
     public void setMesh(NGTriangleMesh triangleMesh) {
