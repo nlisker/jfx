@@ -124,6 +124,7 @@ import com.sun.prism.ResourceFactoryListener;
 import com.sun.prism.Texture.WrapMode;
 import com.sun.prism.impl.Disposer;
 import com.sun.prism.impl.PrismSettings;
+import com.sun.prism.paint.Paint;
 import com.sun.scenario.DelayedRunnable;
 import com.sun.scenario.animation.AbstractMasterTimer;
 import com.sun.scenario.effect.FilterContext;
@@ -1429,17 +1430,15 @@ public final class QuantumToolkit extends Toolkit {
 
     @Override
     public Object renderToImage(ImageRenderingContext p) {
-        Object saveImage = p.platformImage;
-        final ImageRenderingContext params = p;
-        final com.sun.prism.paint.Paint currentPaint = p.platformPaint instanceof com.sun.prism.paint.Paint ?
-                (com.sun.prism.paint.Paint)p.platformPaint : null;
+        Object[] resultImage = new Object[1];
+        final Paint currentPaint = p.platformPaint() instanceof Paint ? (Paint) p.platformPaint() : null;
 
         RenderJob re = new RenderJob(new Runnable() {
 
             private com.sun.prism.paint.Color getClearColor() {
                 if (currentPaint == null) {
                     return com.sun.prism.paint.Color.WHITE;
-                } else if (currentPaint.getType() == com.sun.prism.paint.Paint.Type.COLOR) {
+                } else if (currentPaint.getType() == Paint.Type.COLOR) {
                     return (com.sun.prism.paint.Color) currentPaint;
                 } else if (currentPaint.isOpaque()) {
                     return com.sun.prism.paint.Color.TRANSPARENT;
@@ -1449,8 +1448,8 @@ public final class QuantumToolkit extends Toolkit {
             }
 
             private void draw(Graphics g, int x, int y, int w, int h) {
-                g.setLights(params.lights);
-                g.setDepthBuffer(params.depthBuffer);
+                g.setLights(p.lights());
+                g.setDepthBuffer(p.depthBuffer());
 
                 g.clear(getClearColor());
                 if (currentPaint != null &&
@@ -1464,15 +1463,15 @@ public final class QuantumToolkit extends Toolkit {
                 if (x != 0 || y != 0) {
                     g.translate(-x, -y);
                 }
-                if (params.transform != null) {
-                    g.transform(params.transform);
+                if (p.transform() != null) {
+                    g.transform(p.transform());
                 }
 
-                if (params.root != null) {
-                    if (params.camera != null) {
-                        g.setCamera(params.camera);
+                if (p.root() != null) {
+                    if (p.camera() != null) {
+                        g.setCamera(p.camera());
                     }
-                    NGNode ngNode = params.root;
+                    NGNode ngNode = p.root();
                     ngNode.render(g);
                 }
 
@@ -1480,17 +1479,15 @@ public final class QuantumToolkit extends Toolkit {
 
             @Override
             public void run() {
-
                 ResourceFactory rf = GraphicsPipeline.getDefaultResourceFactory();
-
                 if (!rf.isDeviceReady()) {
                     return;
                 }
 
-                int x = params.x;
-                int y = params.y;
-                int w = params.width;
-                int h = params.height;
+                int x = p.x();
+                int y = p.y();
+                int w = p.width();
+                int h = p.height();
 
                 if (w <= 0 || h <= 0) {
                     return;
@@ -1498,11 +1495,10 @@ public final class QuantumToolkit extends Toolkit {
 
                 boolean errored = false;
                 try {
-                    QuantumImage pImage = (params.platformImage instanceof QuantumImage) ?
-                            (QuantumImage)params.platformImage : new QuantumImage((com.sun.prism.Image)null);
+                    QuantumImage pImage = (p.platformImage() instanceof QuantumImage) ?
+                            (QuantumImage)p.platformImage() : new QuantumImage((com.sun.prism.Image)null);
 
-                    com.sun.prism.RTTexture rt = pImage.getRT(w, h, rf);
-
+                    RTTexture rt = pImage.getRT(w, h, rf);
                     if (rt == null) {
                         return;
                     }
@@ -1529,7 +1525,7 @@ public final class QuantumToolkit extends Toolkit {
 
                     rt.unlock();
 
-                    params.platformImage = pImage;
+                    resultImage[0] = pImage;
 
                 } catch (Throwable t) {
                     errored = true;
@@ -1554,10 +1550,7 @@ public final class QuantumToolkit extends Toolkit {
             }
         } while (true);
 
-        Object image = params.platformImage;
-        params.platformImage = saveImage;
-
-        return image;
+        return resultImage[0];
     }
 
     @Override

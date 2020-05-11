@@ -51,6 +51,7 @@ import com.sun.javafx.scene.traversal.SceneTraversalEngine;
 import com.sun.javafx.scene.traversal.TopMostTraversalEngine;
 import com.sun.javafx.sg.prism.NGCamera;
 import com.sun.javafx.sg.prism.NGLightBase;
+import com.sun.javafx.sg.prism.NGNode;
 import com.sun.javafx.tk.*;
 import com.sun.prism.impl.PrismSettings;
 
@@ -1336,26 +1337,19 @@ public class Scene implements EventTarget {
     /**
      * Capture a single snapshot tile
      */
-    private static WritableImage doSnapshotTile(Scene scene,
-                    int x, int y, int w, int h,
+    private static WritableImage doSnapshotTile(Scene scene, int x, int y, int w, int h,
                     Node root, BaseTransform transform, boolean depthBuffer,
                     Paint fill, Camera camera, WritableImage tileImg) {
-        Toolkit tk = Toolkit.getToolkit();
-        Toolkit.ImageRenderingContext context = new Toolkit.ImageRenderingContext();
+        var toolkit = Toolkit.getToolkit();
+
         if (tileImg == null) {
             tileImg = new WritableImage(w, h);
         }
         setAllowPGAccess(true);
-        context.x = x;
-        context.y = y;
-        context.width = w;
-        context.height = h;
-        context.transform = transform;
-        context.depthBuffer = depthBuffer;
-        context.root = root.getPeer();
-        context.platformPaint = fill == null ? null : tk.getPaint(fill);
+
         double cameraViewWidth = 1.0;
         double cameraViewHeight = 1.0;
+        NGCamera cameraPeer = null;
         if (camera != null) {
             // temporarily adjust camera viewport to the snapshot size
             cameraViewWidth = camera.getViewWidth();
@@ -1363,24 +1357,27 @@ public class Scene implements EventTarget {
             camera.setViewWidth(w);
             camera.setViewHeight(h);
             NodeHelper.updatePeer(camera);
-            context.camera = camera.getPeer();
-        } else {
-            context.camera = null;
+            cameraPeer = camera.getPeer();
         }
 
         // Grab the lights from the scene
-        context.lights = null;
+        NGLightBase[] lights = null;
         if (scene != null && !scene.lights.isEmpty()) {
-            context.lights = new NGLightBase[scene.lights.size()];
+            lights = new NGLightBase[scene.lights.size()];
             for (int i = 0; i < scene.lights.size(); i++) {
-                context.lights[i] = scene.lights.get(i).getPeer();
+                lights[i] = scene.lights.get(i).getPeer();
             }
         }
 
-        Toolkit.WritableImageAccessor accessor = Toolkit.getWritableImageAccessor();
-        context.platformImage = accessor.getTkImageLoader(tileImg);
+        var accessor = Toolkit.getWritableImageAccessor();
+        Object platformPaint = fill == null ? null : toolkit.getPaint(fill);
+        Object platformImage = accessor.getTkImageLoader(tileImg);
+        var context = new Toolkit.ImageRenderingContext(root.getPeer(), x, y, w, h, transform, depthBuffer, platformPaint,
+                cameraPeer, lights, platformImage);
+        
+        
         setAllowPGAccess(false);
-        Object tkImage = tk.renderToImage(context);
+        Object tkImage = toolkit.renderToImage(context);
         accessor.loadTkImage(tileImg, tkImage);
 
         if (camera != null) {

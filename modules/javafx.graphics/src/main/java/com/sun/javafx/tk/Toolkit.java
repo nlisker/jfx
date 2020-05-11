@@ -802,28 +802,31 @@ public abstract class Toolkit {
      * method.
      * @see #renderToImage
      */
-    public static class ImageRenderingContext {
-        // Node to be rendered
-        public NGNode root;
+//    public static class ImageRenderingContext {
+//        // Node to be rendered
+//        public NGNode root;
+//
+//        // Viewport for rendering
+//        public int x;
+//        public int y;
+//        public int width;
+//        public int height;
+//
+//        // Initial transform for root node
+//        public BaseTransform transform;
+//
+//        // Rendering parameters either from Scene or SnapShotParams
+//        public boolean depthBuffer;
+//        public Object platformPaint;
+//        public NGCamera camera;
+//        public NGLightBase[] lights;
+//
+//        // PlatformImage into which to render or null
+//        public Object platformImage;
+//    }
 
-        // Viewport for rendering
-        public int x;
-        public int y;
-        public int width;
-        public int height;
-
-        // Initial transform for root node
-        public BaseTransform transform;
-
-        // Rendering parameters either from Scene or SnapShotParams
-        public boolean depthBuffer;
-        public Object platformPaint;
-        public NGCamera camera;
-        public NGLightBase[] lights;
-
-        // PlatformImage into which to render or null
-        public Object platformImage;
-    }
+    public record ImageRenderingContext(NGNode root, int x, int y, int width, int height, BaseTransform transform,
+            boolean depthBuffer, Object platformPaint, NGCamera camera, NGLightBase[] lights, Object platformImage) {}
 
     /*
      * This method renders a PG-graph to a platform image object.
