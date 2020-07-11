@@ -112,14 +112,7 @@ public abstract class Shape3D extends Node {
      * Used by the caching mechanism to compare between instances of the same shape.
      * Each shape implements equals and hashCode using its base parameters.
      */
-    abstract static class Key {
-
-        @Override
-        public abstract boolean equals(Object obj);
-
-        @Override
-        public abstract int hashCode();
-    }
+    static interface Key {}
 
     /**
      * Defines the material this {@code Shape3D}.

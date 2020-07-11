@@ -443,43 +443,5 @@ public class Sphere extends Shape3D {
         return m;
     }
 
-    private static class SphereKey extends Key {
-
-        final double radius;
-        final int divisions;
-
-        private SphereKey(double radius, int divisions) {
-            this.radius = radius;
-            this.divisions = divisions;
-        }
-
-        @Override
-        public int hashCode() {
-            long bits = 7L;
-            bits = 31L * bits + Double.doubleToLongBits(radius);
-            bits = 31L * bits + divisions;
-            return Long.hashCode(bits);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (!(obj instanceof SphereKey)) {
-                return false;
-            }
-            SphereKey other = (SphereKey) obj;
-            if (divisions != other.divisions) {
-                return false;
-            }
-            if (Double.compare(radius, other.radius) != 0) {
-                return false;
-            }
-            return true;
-        }
-    }
+    private record SphereKey(double radius, int divisions) implements Key {}
 }

@@ -468,47 +468,5 @@ public class Box extends Shape3D {
         return mesh;
     }
 
-    private static class BoxKey extends Key {
-
-        final double width, height, depth;
-
-        private BoxKey(double width, double height, double depth) {
-            this.width = width;
-            this.height = height;
-            this.depth = depth;
-        }
-
-        @Override
-        public int hashCode() {
-            long bits = 7L;
-            bits = 31L * bits + Double.doubleToLongBits(depth);
-            bits = 31L * bits + Double.doubleToLongBits(height);
-            bits = 31L * bits + Double.doubleToLongBits(width);
-            return Long.hashCode(bits);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (!(obj instanceof BoxKey)) {
-                return false;
-            }
-            BoxKey other = (BoxKey) obj;
-            if (Double.compare(depth, other.depth) != 0) {
-                return false;
-            }
-            if (Double.compare(height, other.height) != 0) {
-                return false;
-            }
-            if (Double.compare(width, other.width) != 0) {
-                return false;
-            }
-            return true;
-        }
-    }
+    private record BoxKey(double width, double height, double depth) implements Key {}
 }

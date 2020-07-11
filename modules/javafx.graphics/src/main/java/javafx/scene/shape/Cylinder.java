@@ -563,48 +563,5 @@ public class Cylinder extends Shape3D {
         return m;
     }
 
-    private static class CylinderKey extends Key {
-
-        final double radius, height;
-        final int divisions;
-
-        private CylinderKey(double radius, double height, int divisions) {
-            this.radius = radius;
-            this.height = height;
-            this.divisions = divisions;
-        }
-
-        @Override
-        public int hashCode() {
-            long bits = 7L;
-            bits = 31L * bits + Double.doubleToLongBits(radius);
-            bits = 31L * bits + Double.doubleToLongBits(height);
-            bits = 31L * bits + divisions;
-            return Long.hashCode(bits);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (!(obj instanceof CylinderKey)) {
-                return false;
-            }
-            CylinderKey other = (CylinderKey) obj;
-            if (divisions != other.divisions) {
-                return false;
-            }
-            if (Double.compare(radius, other.radius) != 0) {
-                return false;
-            }
-            if (Double.compare(height, other.height) != 0) {
-                return false;
-            }
-            return true;
-        }
-    }
+    private record CylinderKey(double radius, double height, int divisions) implements Key {}
 }
