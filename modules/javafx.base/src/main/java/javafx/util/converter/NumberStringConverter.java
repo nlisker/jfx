@@ -39,9 +39,9 @@ import javafx.util.StringConverter;
  */
 public class NumberStringConverter extends StringConverter<Number> {
 
-    private final Locale locale;
-    private final String pattern;
-    private final NumberFormat numberFormat;
+//    private final Locale locale;
+//    private final String pattern;
+//    private final NumberFormat numberFormat;
     private NumberFormat cachedNumberFormat;
 
     /**
@@ -86,9 +86,10 @@ public class NumberStringConverter extends StringConverter<Number> {
     }
 
     NumberStringConverter(Locale locale, String pattern, NumberFormat numberFormat) {
-        this.locale = locale;
-        this.pattern = pattern;
-        this.numberFormat = numberFormat;
+//        this.locale = locale;
+//        this.pattern = pattern;
+//        this.numberFormat = numberFormat;
+        cachedNumberFormat = createNumberFormat(locale, pattern, numberFormat);
     }
 
     /** {@inheritDoc} */
@@ -117,10 +118,10 @@ public class NumberStringConverter extends StringConverter<Number> {
     }
 
     private NumberFormat getNumberFormat() {
-        if (cachedNumberFormat != null) {
-            return cachedNumberFormat;
-        }
-        cachedNumberFormat = createNumberFormat();
+//        if (cachedNumberFormat != null) {
+//            return cachedNumberFormat;
+//        }
+//        cachedNumberFormat = createNumberFormat();
         return cachedNumberFormat;
     }
 
@@ -129,16 +130,16 @@ public class NumberStringConverter extends StringConverter<Number> {
      *
      * @return a {@code NumberFormat} instance for formatting and parsing in this {@code StringConverter}
      */
-    private NumberFormat createNumberFormat() {
+    private NumberFormat createNumberFormat(Locale locale, String pattern, NumberFormat numberFormat) {
         if (numberFormat != null) {
             return numberFormat;
         }
-        Locale locale = this.locale == null ? Locale.getDefault() : this.locale;
+        Locale newLocale = locale == null ? Locale.getDefault() : locale;
         if (pattern != null) {
-            var symbols = new DecimalFormatSymbols(locale);
+            var symbols = new DecimalFormatSymbols(newLocale);
             return new DecimalFormat(pattern, symbols);
         }
-        return getSpecializedNumberFormat(locale);
+        return getSpecializedNumberFormat(newLocale);
     }
 
     protected NumberFormat getSpecializedNumberFormat(Locale locale) {
