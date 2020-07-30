@@ -25,10 +25,9 @@
 
 package javafx.util.converter;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Locale;
+
 import javafx.util.StringConverter;
 
 /**
@@ -80,17 +79,8 @@ public class CurrencyStringConverter extends NumberStringConverter {
         super(null, null, numberFormat);
     }
 
-    /** {@inheritDoc} */
-    @Override protected NumberFormat getNumberFormat() {
-        Locale _locale = locale == null ? Locale.getDefault() : locale;
-
-        if (numberFormat != null) {
-            return numberFormat;
-        } else if (pattern != null) {
-            DecimalFormatSymbols symbols = new DecimalFormatSymbols(_locale);
-            return new DecimalFormat(pattern, symbols);
-        } else {
-            return NumberFormat.getCurrencyInstance(_locale);
-        }
+    @Override
+    protected NumberFormat getSpecializedNumberFormat(Locale locale) {
+        return NumberFormat.getCurrencyInstance(locale);
     }
 }

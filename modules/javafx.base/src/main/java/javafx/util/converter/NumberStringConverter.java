@@ -39,9 +39,10 @@ import javafx.util.StringConverter;
  */
 public class NumberStringConverter extends StringConverter<Number> {
 
-    final Locale locale;
-    final String pattern;
-    final NumberFormat numberFormat;
+    private final Locale locale;
+    private final String pattern;
+    private final NumberFormat numberFormat;
+    private NumberFormat cachedNumberFormat;
 
     /**
      * Constructs a {@code NumberStringConverter} with the default locale and format.
@@ -91,23 +92,18 @@ public class NumberStringConverter extends StringConverter<Number> {
     }
 
     /** {@inheritDoc} */
-    @Override public Number fromString(String value) {
+    @Override
+    public Number fromString(String value) {
+        if (value == null) {
+            return null;
+        }
+        value = value.trim();
+        if (value.isEmpty()) {
+            return null;
+        }
+
+        var parser = getNumberFormat();
         try {
-            // If the specified value is null or zero-length, return null
-            if (value == null) {
-                return null;
-            }
-
-            value = value.trim();
-
-            if (value.length() < 1) {
-                return null;
-            }
-
-            // Create and configure the parser to be used
-            NumberFormat parser = getNumberFormat();
-
-            // Perform the requested parsing
             return parser.parse(value);
         } catch (ParseException ex) {
             throw new RuntimeException(ex);
@@ -115,36 +111,37 @@ public class NumberStringConverter extends StringConverter<Number> {
     }
 
     /** {@inheritDoc} */
-    @Override public String toString(Number value) {
-        // If the specified value is null, return a zero-length String
-        if (value == null) {
-            return "";
+    @Override
+    public String toString(Number value) {
+        return value == null ? "" : getNumberFormat().format(value);
+    }
+
+    private NumberFormat getNumberFormat() {
+        if (cachedNumberFormat != null) {
+            return cachedNumberFormat;
         }
-
-        // Create and configure the formatter to be used
-        NumberFormat formatter = getNumberFormat();
-
-        // Perform the requested formatting
-        return formatter.format(value);
+        cachedNumberFormat = createNumberFormat();
+        return cachedNumberFormat;
     }
 
     /**
-     * Returns a {@code NumberFormat} instance to use for formatting
-     * and parsing in this {@code StringConverter}.
+     * Returns a {@code NumberFormat} instance to use for formatting and parsing in this {@code StringConverter}.
      *
-     * @return a {@code NumberFormat} instance for formatting and parsing in this
-     * {@code StringConverter}
+     * @return a {@code NumberFormat} instance for formatting and parsing in this {@code StringConverter}
      */
-    protected NumberFormat getNumberFormat() {
-        Locale _locale = locale == null ? Locale.getDefault() : locale;
-
+    private NumberFormat createNumberFormat() {
         if (numberFormat != null) {
             return numberFormat;
-        } else if (pattern != null) {
-            DecimalFormatSymbols symbols = new DecimalFormatSymbols(_locale);
-            return new DecimalFormat(pattern, symbols);
-        } else {
-            return NumberFormat.getNumberInstance(_locale);
         }
+        Locale locale = this.locale == null ? Locale.getDefault() : this.locale;
+        if (pattern != null) {
+            var symbols = new DecimalFormatSymbols(locale);
+            return new DecimalFormat(pattern, symbols);
+        }
+        return getSpecializedNumberFormat(locale);
+    }
+
+    protected NumberFormat getSpecializedNumberFormat(Locale locale) {
+        return NumberFormat.getNumberInstance(locale);
     }
 }

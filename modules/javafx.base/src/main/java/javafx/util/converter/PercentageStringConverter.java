@@ -60,14 +60,8 @@ public class PercentageStringConverter extends NumberStringConverter {
         super(null, null, numberFormat);
     }
 
-    /** {@inheritDoc} */
-    @Override public NumberFormat getNumberFormat() {
-        Locale _locale = locale == null ? Locale.getDefault() : locale;
-
-        if (numberFormat != null) {
-            return numberFormat;
-        } else {
-            return NumberFormat.getPercentInstance(_locale);
-        }
+    @Override
+    protected NumberFormat getSpecializedNumberFormat(Locale locale) {
+        return NumberFormat.getPercentInstance(locale);
     }
 }
