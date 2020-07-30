@@ -30,7 +30,8 @@ import java.util.Locale;
 import javafx.util.StringConverter;
 
 /**
- * {@link StringConverter} implementation for {@link Number} values that represent percentages.
+ * A {@link StringConverter} implementation for {@link Number} values that represent percentages. Instances of this class are
+ * immutable.
  *
  * @see CurrencyStringConverter
  * @see NumberStringConverter
@@ -43,21 +44,21 @@ public class PercentageStringConverter extends NumberStringConverter {
      * Constructs a {@code PercentageStringConverter} with the default locale and format.
      */
     public PercentageStringConverter() {
-        this(Locale.getDefault());
+        super(Locale.getDefault());
     }
 
     /**
      * Constructs a {@code PercentageStringConverter} with the given locale and the default format.
      */
     public PercentageStringConverter(Locale locale) {
-        super(locale, null, null);
+        super(locale);
     }
 
     /**
-     * Constructs a {@code PercentageStringConverter} with the default locale and the given number format.
+     * Constructs a {@code PercentageStringConverter} with the given number format.
      */
     public PercentageStringConverter(NumberFormat numberFormat) {
-        super(null, null, numberFormat);
+        super(numberFormat);
     }
 
     @Override

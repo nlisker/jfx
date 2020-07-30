@@ -33,16 +33,13 @@ import java.util.Locale;
 import javafx.util.StringConverter;
 
 /**
- * {@link StringConverter} implementation for {@link Number} values.
+ * A {@link StringConverter} implementation for {@link Number} values. Instances of this class are immutable.
  *
  * @since JavaFX 2.1
  */
 public class NumberStringConverter extends StringConverter<Number> {
 
-//    private final Locale locale;
-//    private final String pattern;
-//    private final NumberFormat numberFormat;
-    private NumberFormat cachedNumberFormat;
+    private NumberFormat numberFormat;
 
     /**
      * Constructs a {@code NumberStringConverter} with the default locale and format.
@@ -77,19 +74,24 @@ public class NumberStringConverter extends StringConverter<Number> {
     }
 
     /**
-     * Constructs a {@code NumberStringConverter} with the default locale and the given number format.
-     *
-     * @see java.text.DecimalFormat
+     * Constructs a {@code NumberStringConverter} with the given number format.
      */
     public NumberStringConverter(NumberFormat numberFormat) {
         this(null, null, numberFormat);
     }
 
-    NumberStringConverter(Locale locale, String pattern, NumberFormat numberFormat) {
-//        this.locale = locale;
-//        this.pattern = pattern;
-//        this.numberFormat = numberFormat;
-        cachedNumberFormat = createNumberFormat(locale, pattern, numberFormat);
+    private NumberStringConverter(Locale locale, String pattern, NumberFormat numberFormat) {
+        if (numberFormat != null) {
+            this.numberFormat = numberFormat;
+            return;
+        }
+        Locale newLocale = locale == null ? Locale.getDefault() : locale;
+        if (pattern != null) {
+            var symbols = new DecimalFormatSymbols(newLocale);
+            this.numberFormat =  new DecimalFormat(pattern, symbols);
+            return;
+        }
+        this.numberFormat = getSpecializedNumberFormat(newLocale);
     }
 
     /** {@inheritDoc} */
@@ -103,9 +105,8 @@ public class NumberStringConverter extends StringConverter<Number> {
             return null;
         }
 
-        var parser = getNumberFormat();
         try {
-            return parser.parse(value);
+            return numberFormat.parse(value);
         } catch (ParseException ex) {
             throw new RuntimeException(ex);
         }
@@ -114,35 +115,17 @@ public class NumberStringConverter extends StringConverter<Number> {
     /** {@inheritDoc} */
     @Override
     public String toString(Number value) {
-        return value == null ? "" : getNumberFormat().format(value);
-    }
-
-    private NumberFormat getNumberFormat() {
-//        if (cachedNumberFormat != null) {
-//            return cachedNumberFormat;
-//        }
-//        cachedNumberFormat = createNumberFormat();
-        return cachedNumberFormat;
-    }
-
-    /**
-     * Returns a {@code NumberFormat} instance to use for formatting and parsing in this {@code StringConverter}.
-     *
-     * @return a {@code NumberFormat} instance for formatting and parsing in this {@code StringConverter}
-     */
-    private NumberFormat createNumberFormat(Locale locale, String pattern, NumberFormat numberFormat) {
-        if (numberFormat != null) {
-            return numberFormat;
-        }
-        Locale newLocale = locale == null ? Locale.getDefault() : locale;
-        if (pattern != null) {
-            var symbols = new DecimalFormatSymbols(newLocale);
-            return new DecimalFormat(pattern, symbols);
-        }
-        return getSpecializedNumberFormat(newLocale);
+        return value == null ? "" : numberFormat.format(value);
     }
 
     protected NumberFormat getSpecializedNumberFormat(Locale locale) {
         return NumberFormat.getNumberInstance(locale);
+    }
+
+    /**
+     * Used for tests only
+     */
+    NumberFormat getNumberFormat() {
+        return numberFormat;
     }
 }
