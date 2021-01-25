@@ -32,30 +32,10 @@ import javafx.util.StringConverter;
  * (and long primitive) values.</p>
  * @since JavaFX 2.1
  */
-public class LongStringConverter extends StringConverter<Long> {
-    /** {@inheritDoc} */
-    @Override public Long fromString(String value) {
-        // If the specified value is null or zero-length, return null
-        if (value == null) {
-            return null;
-        }
+public class LongStringConverter extends BaseStringConverter<Long> {
 
-        value = value.trim();
-
-        if (value.length() < 1) {
-            return null;
-        }
-
-        return Long.valueOf(value);
-    }
-
-    /** {@inheritDoc} */
-    @Override public String toString(Long value) {
-        // If the specified value is null, return a zero-length String
-        if (value == null) {
-            return "";
-        }
-
-        return Long.toString(((Long)value).longValue());
+    @Override
+    Long fromNonEmptyString(String string) {
+        return Long.valueOf(string);
     }
 }

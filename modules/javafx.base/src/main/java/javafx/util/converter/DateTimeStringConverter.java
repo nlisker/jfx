@@ -40,7 +40,7 @@ import javafx.util.StringConverter;
  * @see TimeStringConverter
  * @since JavaFX 2.1
  */
-public class DateTimeStringConverter extends StringConverter<Date> {
+public class DateTimeStringConverter extends BaseStringConverter<Date> {
 
     // ------------------------------------------------------ Private properties
     protected final Locale locale;
@@ -153,42 +153,18 @@ public class DateTimeStringConverter extends StringConverter<Date> {
 
     // ------------------------------------------------------- Converter Methods
 
-    /** {@inheritDoc} */
-    @Override public Date fromString(String value) {
+    @Override
+    Date fromNonEmptyString(String string) {
         try {
-            // If the specified value is null or zero-length, return null
-            if (value == null) {
-                return (null);
-            }
-
-            value = value.trim();
-
-            if (value.length() < 1) {
-                return (null);
-            }
-
-            // Create and configure the parser to be used
-            DateFormat parser = getDateFormat();
-
-            // Perform the requested parsing
-            return parser.parse(value);
-        } catch (ParseException ex) {
-            throw new RuntimeException(ex);
+            return getDateFormat().parse(string);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    /** {@inheritDoc} */
-    @Override public String toString(Date value) {
-        // If the specified value is null, return a zero-length String
-        if (value == null) {
-            return "";
-        }
-
-        // Create and configure the formatter to be used
-        DateFormat formatter = getDateFormat();
-
-        // Perform the requested formatting
-        return formatter.format(value);
+    @Override
+    String toStringFromNonNull(Date data) {
+        return getDateFormat().format(data);
     }
 
     // --------------------------------------------------------- Private Methods

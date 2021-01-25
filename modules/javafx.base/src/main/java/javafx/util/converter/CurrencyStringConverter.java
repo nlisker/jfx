@@ -31,7 +31,8 @@ import java.util.Locale;
 import javafx.util.StringConverter;
 
 /**
- * A {@link StringConverter} implementation for {@link Number} values that represent currency. Instances of this class are immutable.
+ * A {@link StringConverter} implementation for {@link Number} values that represent currency. Instances of this class
+ * are immutable.
  *
  * @see PercentageStringConverter
  * @see NumberStringConverter

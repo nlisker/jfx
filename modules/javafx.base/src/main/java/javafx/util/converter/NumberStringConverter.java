@@ -37,7 +37,7 @@ import javafx.util.StringConverter;
  *
  * @since JavaFX 2.1
  */
-public class NumberStringConverter extends StringConverter<Number> {
+public class NumberStringConverter extends BaseStringConverter<Number> {
 
     private NumberFormat numberFormat;
 
@@ -94,31 +94,22 @@ public class NumberStringConverter extends StringConverter<Number> {
         this.numberFormat = getSpecializedNumberFormat(newLocale);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public Number fromString(String value) {
-        if (value == null) {
-            return null;
-        }
-        value = value.trim();
-        if (value.isEmpty()) {
-            return null;
-        }
-
+    Number fromNonEmptyString(String string) {
         try {
-            return numberFormat.parse(value);
-        } catch (ParseException ex) {
-            throw new RuntimeException(ex);
+            return numberFormat.parse(string);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    /** {@inheritDoc} */
     @Override
-    public String toString(Number value) {
-        return value == null ? "" : numberFormat.format(value);
+    String toStringFromNonNull(Number number) {
+        return numberFormat.format(number);
     }
 
-    protected NumberFormat getSpecializedNumberFormat(Locale locale) {
+    // treat as protected
+    NumberFormat getSpecializedNumberFormat(Locale locale) {
         return NumberFormat.getNumberInstance(locale);
     }
 

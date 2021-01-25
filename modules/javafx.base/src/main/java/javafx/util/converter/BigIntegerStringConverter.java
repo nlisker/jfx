@@ -26,36 +26,17 @@
 package javafx.util.converter;
 
 import java.math.BigInteger;
+
 import javafx.util.StringConverter;
 
 /**
  * <p>{@link StringConverter} implementation for {@link BigInteger} values.</p>
  * @since JavaFX 2.1
  */
-public class BigIntegerStringConverter extends StringConverter<BigInteger> {
-    /** {@inheritDoc} */
-    @Override public BigInteger fromString(String value) {
-        // If the specified value is null or zero-length, return null
-        if (value == null) {
-            return null;
-        }
+public class BigIntegerStringConverter extends BaseStringConverter<BigInteger> {
 
-        value = value.trim();
-
-        if (value.length() < 1) {
-            return null;
-        }
-
-        return new BigInteger(value);
-    }
-
-    /** {@inheritDoc} */
-    @Override public String toString(BigInteger value) {
-        // If the specified value is null, return a zero-length String
-        if (value == null) {
-            return "";
-        }
-
-        return ((BigInteger)value).toString();
+    @Override
+    BigInteger fromNonEmptyString(String string) {
+        return new BigInteger(string);
     }
 }

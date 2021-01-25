@@ -56,8 +56,6 @@ public class LocalDateTimeStringConverter extends StringConverter<LocalDateTime>
 
     LdtConverter<LocalDateTime> ldtConverter;
 
-
-
    // ------------------------------------------------------------ Constructors
 
     /**
@@ -166,7 +164,7 @@ public class LocalDateTimeStringConverter extends StringConverter<LocalDateTime>
 
 
 
-    static class LdtConverter<T extends Temporal> extends StringConverter<T> {
+    static class LdtConverter<T extends Temporal> extends BaseStringConverter<T> {
         private Class<T> type;
         Locale locale;
         Chronology chronology;
@@ -192,20 +190,13 @@ public class LocalDateTimeStringConverter extends StringConverter<LocalDateTime>
             }
         }
 
-        /** {@inheritDoc} */
-        @SuppressWarnings({"unchecked"})
-        @Override public T fromString(String text) {
-            if (text == null || text.isEmpty()) {
-                return null;
-            }
-
-            text = text.trim();
-
+        @Override
+        T fromNonEmptyString(String string) {
             if (parser == null) {
                 parser = getDefaultParser();
             }
 
-            TemporalAccessor temporal = parser.parse(text);
+            TemporalAccessor temporal = parser.parse(string);
 
             if (type == LocalDate.class) {
                 return (T)LocalDate.from(chronology.date(temporal));
@@ -216,14 +207,8 @@ public class LocalDateTimeStringConverter extends StringConverter<LocalDateTime>
             }
         }
 
-
-        /** {@inheritDoc} */
-        @Override public String toString(T value) {
-            // If the specified value is null, return a zero-length String
-            if (value == null) {
-                return "";
-            }
-
+        @Override
+        String toStringFromNonNull(T value) {
             if (formatter == null) {
                 formatter = getDefaultFormatter();
             }
@@ -252,7 +237,6 @@ public class LocalDateTimeStringConverter extends StringConverter<LocalDateTime>
                 return formatter.format(value);
             }
         }
-
 
         private DateTimeFormatter getDefaultParser() {
             String pattern =

@@ -26,9 +26,9 @@
 package javafx.util;
 
 /**
- * Converter defines conversion behavior between strings and objects.
+ * Defines conversion behavior between strings and objects.
  * The type of objects and formats of strings are defined by the subclasses
- * of Converter.
+ * of {@code StringConverter}.
  * @since JavaFX 2.0
  */
 public abstract class StringConverter<T> {

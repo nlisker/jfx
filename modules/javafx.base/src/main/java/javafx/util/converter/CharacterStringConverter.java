@@ -32,30 +32,10 @@ import javafx.util.StringConverter;
  * (and char primitive) values.</p>
  * @since JavaFX 2.1
  */
-public class CharacterStringConverter extends StringConverter<Character> {
-    /** {@inheritDoc} */
-    @Override public Character fromString(String value) {
-        // If the specified value is null or zero-length, return null
-        if (value == null) {
-            return null;
-        }
+public class CharacterStringConverter extends BaseStringConverter<Character> {
 
-        value = value.trim();
-
-        if (value.length() < 1) {
-            return null;
-        }
-
-        return Character.valueOf(value.charAt(0));
-    }
-
-    /** {@inheritDoc} */
-    @Override public String toString(Character value) {
-        // If the specified value is null, return a zero-length String
-        if (value == null) {
-            return "";
-        }
-
-        return value.toString();
+    @Override
+    Character fromNonEmptyString(String string) {
+        return Character.valueOf(string.charAt(0));
     }
 }
