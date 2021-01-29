@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2021, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -26,22 +26,21 @@
 package javafx.util.converter;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
 import javafx.util.StringConverter;
 
 /**
- * <p>{@link StringConverter} implementation for {@link Date} values that
- * represent time.</p>
+ * A {@code StringConverter} implementation for {@link Date} values that represent time. Instances of this
+ * class are immutable.
+ * <p>
+ * Note that using {@code Date} is not recommended in JDK versions where {@link java.time.LocalTime} is available,
+ * in which case {@link LocalTimeStringConverter} should be used.
  *
- * @see DateStringConverter
- * @see DateTimeStringConverter
  * @since JavaFX 2.1
  */
 public class TimeStringConverter extends DateTimeStringConverter {
-
-    // ------------------------------------------------------------ Constructors
 
     /**
      * Create a {@link StringConverter} for {@link Date} values, using the
@@ -123,24 +122,9 @@ public class TimeStringConverter extends DateTimeStringConverter {
     private TimeStringConverter(Locale locale, String pattern, DateFormat dateFormat, int timeStyle) {
         super(locale, pattern, dateFormat, DateFormat.DEFAULT, timeStyle);
     }
-
-
-    // --------------------------------------------------------- Private Methods
-
-    /** {@inheritDoc} */
-    @Override protected DateFormat getDateFormat() {
-        DateFormat df = null;
-
-        if (dateFormat != null) {
-            return dateFormat;
-        } else if (pattern != null) {
-            df = new SimpleDateFormat(pattern, locale);
-        } else {
-            df = DateFormat.getTimeInstance(timeStyle, locale);
-        }
-
-        df.setLenient(false);
-
-        return df;
+    
+    @Override
+    DateFormat getSpecialziedDataFormat() {
+        return DateFormat.getTimeInstance(timeStyle, locale);
     }
 }

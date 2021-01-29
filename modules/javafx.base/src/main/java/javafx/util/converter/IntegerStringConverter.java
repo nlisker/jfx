@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2021, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,14 +25,18 @@
 
 package javafx.util.converter;
 
-import javafx.util.StringConverter;
-
 /**
- * <p>{@link StringConverter} implementation for {@link Integer}
- * (and int primitive) values.</p>
+ * A {@code StringConverter} implementation for {@code Integer} (and {@code integer}) values.
+ *
  * @since JavaFX 2.1
  */
 public class IntegerStringConverter extends BaseStringConverter<Integer> {
+
+    /**
+     * Creates a default {@code IntegerStringConverter}.
+     */
+    public IntegerStringConverter() {
+    }
 
     @Override
     Integer fromNonEmptyString(String string) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2014, 2021, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,36 +25,46 @@
 
 package javafx.util.converter;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.chrono.ChronoLocalDate;
 import java.time.chrono.Chronology;
 import java.time.chrono.IsoChronology;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DecimalStyle;
 import java.time.format.FormatStyle;
+import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
+import java.util.Objects;
 
-import javafx.util.StringConverter;
-import javafx.util.converter.LocalDateTimeStringConverter.LdtConverter;
+import com.sun.javafx.binding.Logging;
 
 /**
- * <p>{@link StringConverter} implementation for {@link LocalDate} values.</p>
+ * A {@code StringConverter} implementation for {@link LocalDate} values. Instances of this class are immutable.
  *
  * @see LocalTimeStringConverter
  * @see LocalDateTimeStringConverter
  * @since JavaFX 8u40
  */
-public class LocalDateStringConverter extends StringConverter<LocalDate> {
+public class LocalDateStringConverter extends BaseStringConverter<LocalDate> {
 
-    LdtConverter<LocalDate> ldtConverter;
+    private static final FormatStyle DEFAULT_STYLE = FormatStyle.SHORT;
+    private static final Chronology DEFAULT_CHRONOLOGY = IsoChronology.INSTANCE;
+    private static Locale defaultLocale() {
+        return Locale.getDefault(Locale.Category.FORMAT);
+    }
 
-    // ------------------------------------------------------------ Constructors
+    private final DateTimeFormatter formatter;
+    private final DateTimeFormatter parser;
 
     /**
-     * Create a {@link StringConverter} for {@link LocalDate} values, using a
+     * Create a {@code LocalDateStringConverter} using a
      * default formatter and parser based on {@link IsoChronology},
      * {@link FormatStyle#SHORT}, and the user's {@link Locale}.
      *
-     * <p>This converter ensures symmetry between the toString() and
-     * fromString() methods. Many of the default locale based patterns used by
+     * <p>This converter ensures symmetry between the {@code toString()} and
+     * {@code fromString()} methods. Many of the default locale based patterns used by
      * {@link DateTimeFormatter} will display only two digits for the year when
      * formatting to a string. This would cause a value like 1955 to be
      * displayed as 55, which in turn would be parsed back as 2055. This
@@ -63,25 +73,43 @@ public class LocalDateStringConverter extends StringConverter<LocalDate> {
      * parsed leniently as expected in these locales.</p>
      */
     public LocalDateStringConverter() {
-        ldtConverter = new LdtConverter<LocalDate>(LocalDate.class, null, null,
-                                                  null, null, null, null);
+        this(DEFAULT_STYLE);
     }
 
     /**
-     * Create a {@link StringConverter} for {@link LocalDate} values, using a
+     * Create a {@code LocalDateStringConverter} using a
      * default formatter and parser based on {@link IsoChronology},
      * the specified {@link FormatStyle}, and the user's {@link Locale}.
      *
-     * @param dateStyle The {@link FormatStyle} that will be used by the default
-     * formatter and parser. If null then {@link FormatStyle#SHORT} will be used.
+     * @param dateStyle the {@code FormatStyle} that will be used by the default
+     * formatter and parser. If {@code null}, then {@link FormatStyle#SHORT} will be used.
      */
     public LocalDateStringConverter(FormatStyle dateStyle) {
-        ldtConverter = new LdtConverter<LocalDate>(LocalDate.class, null, null,
-                                                  dateStyle, null, null, null);
+        this(dateStyle, defaultLocale(), DEFAULT_CHRONOLOGY);
     }
 
     /**
-     * Create a {#link StringConverter} for {@link LocalDate} values using the supplied
+     * Create a {@code LocalDateStringConverter} using a
+     * default formatter and parser based on the supplied
+     * {@link FormatStyle}, {@link Locale}, and {@link Chronology}.
+     *
+     * @param dateStyle the {@code FormatStyle} that will be used by the default
+     * formatter and parser. If {@code null} then {@link FormatStyle#SHORT} will be used.
+     * @param locale the {@code Locale} that will be used by the default
+     * formatter and parser. If {@code null} then {@code Locale.getDefault(Locale.Category.FORMAT)} will be used.
+     * @param chronology the {@code Chronology} that will be used by the default
+     * formatter and parser. If {@code null} then {@link IsoChronology#INSTANCE} will be used.
+     */
+    public LocalDateStringConverter(FormatStyle dateStyle, Locale locale, Chronology chronology) {
+        dateStyle = Objects.requireNonNullElse(dateStyle, DEFAULT_STYLE);
+        locale = Objects.requireNonNullElseGet(locale, () -> defaultLocale());
+        chronology = Objects.requireNonNullElse(chronology, DEFAULT_CHRONOLOGY);
+        parser = getDefaultParser(dateStyle, locale, chronology);
+        formatter = getDefaultFormatter(dateStyle, locale, chronology);
+    }
+
+    /**
+     * Create a {@code LocalDateStringConverter} using the supplied
      * formatter and parser.
      *
      * <p>For example, to use a fixed pattern for converting both ways:</p>
@@ -95,48 +123,72 @@ public class LocalDateStringConverter extends StringConverter<LocalDate> {
      * Note that the formatter and parser can be created to handle non-default
      * {@link Locale} and {@link Chronology} as needed.
      *
-     * @param formatter An instance of {@link DateTimeFormatter} that will be
-     * used for formatting by the toString() method. If null then a default
+     * @param formatter an instance of {@link DateTimeFormatter} that will be
+     * used for formatting by the {@code toString()} method. If {@code null}, then a default
      * formatter will be used.
-     * @param parser An instance of {@link DateTimeFormatter} that will be used
-     * for parsing by the fromString() method. This can be identical to
-     * formatter. If null then formatter will be used, and if that is also null,
+     * @param parser an instance of {@link DateTimeFormatter} that will be used
+     * for parsing by the {@code fromString()} method. This can be identical to
+     * formatter. If {@code null}, then {@code formatter} will be used, and if that is also {@code null},
      * then a default parser will be used.
      */
     public LocalDateStringConverter(DateTimeFormatter formatter, DateTimeFormatter parser) {
-        ldtConverter = new LdtConverter<LocalDate>(LocalDate.class, formatter, parser,
-                                                   null, null, null, null);
+        this.formatter = formatter == null ?
+                (getDefaultFormatter(DEFAULT_STYLE, defaultLocale(), DEFAULT_CHRONOLOGY)) :
+                (formatter.getChronology() == null ? formatter.withChronology(DEFAULT_CHRONOLOGY) : formatter);
+        this.parser = parser == null ?
+                (formatter == null ? getDefaultParser(DEFAULT_STYLE, defaultLocale(), DEFAULT_CHRONOLOGY) : this.formatter) :
+                (parser.getChronology() == null ? parser.withChronology(DEFAULT_CHRONOLOGY) : parser);
     }
 
+    private DateTimeFormatter getDefaultParser(FormatStyle dateStyle, Locale locale, Chronology chronology) {
+        String pattern = DateTimeFormatterBuilder.getLocalizedDateTimePattern(dateStyle, null, chronology, locale);
+        return new DateTimeFormatterBuilder().parseLenient()
+                                             .appendPattern(pattern)
+                                             .toFormatter()
+                                             .withChronology(chronology)
+                                             .withDecimalStyle(DecimalStyle.of(locale));
+    }
 
     /**
-     * Create a StringConverter for {@link LocalDate} values using a default
-     * formatter and parser, which will be based on the supplied
-     * {@link FormatStyle}, {@link Locale}, and {@link Chronology}.
-     *
-     * @param dateStyle The {@link FormatStyle} that will be used by the default
-     * formatter and parser. If null then {@link FormatStyle#SHORT} will be used.
-     * @param locale The {@link Locale} that will be used by the default
-     * formatter and parser. If null then
-     * {@code Locale.getDefault(Locale.Category.FORMAT)} will be used.
-     * @param chronology The {@link Chronology} that will be used by the default
-     * formatter and parser. If null then {@link IsoChronology#INSTANCE} will be used.
+     * Return a default {@code DateTimeFormatter} instance to use for formatting
+     * and parsing in this {@code LocalDateStringConverter}.
      */
-    public LocalDateStringConverter(FormatStyle dateStyle, Locale locale, Chronology chronology) {
-        ldtConverter = new LdtConverter<LocalDate>(LocalDate.class, null, null,
-                                                  dateStyle, null, locale, chronology);
+    private DateTimeFormatter getDefaultFormatter(FormatStyle dateStyle, Locale locale, Chronology chronology) {
+        var formatter = DateTimeFormatter.ofLocalizedDate(dateStyle);
+        formatter = formatter.withLocale(locale)
+                             .withChronology(chronology)
+                             .withDecimalStyle(DecimalStyle.of(locale));
+        return fixFourDigitYear(formatter, dateStyle, locale, chronology);
     }
 
-    // ------------------------------------------------------- Converter Methods
-
-    /** {@inheritDoc} */
-    @Override public LocalDate fromString(String value) {
-        return ldtConverter.fromString(value);
+    private DateTimeFormatter fixFourDigitYear(DateTimeFormatter formatter, FormatStyle dateStyle, Locale locale,
+                                               Chronology chronology) {
+        String pattern = DateTimeFormatterBuilder.getLocalizedDateTimePattern(dateStyle, null, chronology, locale);
+        if (pattern.contains("yy") && !pattern.contains("yyy")) {
+            // Modify pattern to show four-digit year, including leading zeros.
+            String newPattern = pattern.replace("yy", "yyyy");
+            return DateTimeFormatter.ofPattern(newPattern).withDecimalStyle(DecimalStyle.of(locale));
+        }
+        return formatter;
     }
 
-    /** {@inheritDoc} */
-    @Override public String toString(LocalDate value) {
-        return ldtConverter.toString(value);
+    @Override
+    LocalDate fromNonEmptyString(String string) {
+        TemporalAccessor temporal = parser.parse(string);
+        return LocalDate.from(parser.getChronology().date(temporal));
+//        return LocalDate.parse(string, parser);
     }
 
+    @Override
+    String toStringFromNonNull(LocalDate value) {
+        ChronoLocalDate cDate;
+        try {
+            cDate = formatter.getChronology().date(value);
+        } catch (DateTimeException ex) {
+            Logging.getLogger().warning("Converting LocalDate " + value + " to " + formatter.getChronology()
+                    + " failed, falling back to IsoChronology.", ex);
+            cDate = value;
+        }
+        return formatter.format(cDate);
+    }
 }

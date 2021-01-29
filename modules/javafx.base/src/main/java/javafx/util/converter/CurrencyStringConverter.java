@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2021, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -28,15 +28,10 @@ package javafx.util.converter;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import javafx.util.StringConverter;
-
 /**
- * A {@link StringConverter} implementation for {@link Number} values that represent currency. Instances of this class
+ * A {@code StringConverter} implementation for {code Number} values that represent currency. Instances of this class
  * are immutable.
  *
- * @see PercentageStringConverter
- * @see NumberStringConverter
- * @see StringConverter
  * @since JavaFX 2.1
  */
 public class CurrencyStringConverter extends NumberStringConverter {
@@ -45,7 +40,7 @@ public class CurrencyStringConverter extends NumberStringConverter {
      * Constructs a {@code CurrencyStringConverter} with the default locale and format.
      */
     public CurrencyStringConverter() {
-        super(Locale.getDefault());
+        super((Locale) null);
     }
 
     /**
@@ -61,7 +56,7 @@ public class CurrencyStringConverter extends NumberStringConverter {
      * @see java.text.DecimalFormat
      */
     public CurrencyStringConverter(String pattern) {
-        super(Locale.getDefault(), pattern);
+        super(null, pattern);
     }
 
     /**
@@ -81,7 +76,7 @@ public class CurrencyStringConverter extends NumberStringConverter {
     }
 
     @Override
-    protected NumberFormat getSpecializedNumberFormat(Locale locale) {
+    NumberFormat getSpecializedNumberFormat(Locale locale) {
         return NumberFormat.getCurrencyInstance(locale);
     }
 }

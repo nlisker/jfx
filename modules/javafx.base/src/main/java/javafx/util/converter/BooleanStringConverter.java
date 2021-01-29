@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2021, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,14 +25,20 @@
 
 package javafx.util.converter;
 
-import javafx.util.StringConverter;
-
 /**
- * <p>{@link StringConverter} implementation for {@link Boolean}
- * (and boolean primitive) values.</p>
+ * A {@code StringConverter} implementation for {@code Boolean} (and {@code boolean}) values. Formatting is done by
+ * {@link Boolean#toString()} for non-{@code null} values, and parsing with {@link Boolean#valueOf(String)} for
+ * non-{@code null} non-empty strings.
+ *
  * @since JavaFX 2.1
  */
 public class BooleanStringConverter extends BaseStringConverter<Boolean> {
+
+    /**
+     * Creates a default {@code BooleanStringConverter}.
+     */
+    public BooleanStringConverter() {
+    }
 
     @Override
     Boolean fromNonEmptyString(String string) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2021, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -30,19 +30,20 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
 import javafx.util.StringConverter;
 
 /**
- * <p>{@link StringConverter} implementation for {@link Date} values that
- * represent a date and time.</p>
+ * A {@code StringConverter} implementation for {@link Date} values that represent dates and times. Instances of this
+ * class are immutable.
+ * <p>
+ * Note that using {@code Date} is not recommended in JDK versions where {@link java.time.LocalDateTime} is available,
+ * in which case {@link LocalDateTimeStringConverter} should be used.
  *
- * @see DateStringConverter
- * @see TimeStringConverter
  * @since JavaFX 2.1
  */
 public class DateTimeStringConverter extends BaseStringConverter<Date> {
 
-    // ------------------------------------------------------ Private properties
     protected final Locale locale;
     protected final String pattern;
     protected final DateFormat dateFormat;
@@ -56,9 +57,6 @@ public class DateTimeStringConverter extends BaseStringConverter<Date> {
      * @since JavaFX 8u40
      */
     protected final int timeStyle;
-
-
-    // ------------------------------------------------------------ Constructors
 
     /**
      * Create a {@link StringConverter} for {@link Date} values, using
@@ -141,22 +139,29 @@ public class DateTimeStringConverter extends BaseStringConverter<Date> {
         this(null, null, dateFormat, DateFormat.DEFAULT, DateFormat.DEFAULT);
     }
 
-    DateTimeStringConverter(Locale locale, String pattern, DateFormat dateFormat,
-                            int dateStyle, int timeStyle) {
+    DateTimeStringConverter(Locale locale, String pattern, DateFormat dateFormat, int dateStyle, int timeStyle) {
         this.locale = (locale != null) ? locale : Locale.getDefault(Locale.Category.FORMAT);
         this.pattern = pattern;
-        this.dateFormat = dateFormat;
         this.dateStyle = dateStyle;
         this.timeStyle = timeStyle;
+
+        if (dateFormat != null) {
+            this.dateFormat = dateFormat;
+            return;
+        }
+        this.dateFormat = pattern != null ? new SimpleDateFormat(pattern, locale) : getSpecialziedDataFormat();
+        this.dateFormat.setLenient(false);
     }
 
-
-    // ------------------------------------------------------- Converter Methods
+    // treat as protected
+    DateFormat getSpecialziedDataFormat() {
+        return DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);
+    }
 
     @Override
     Date fromNonEmptyString(String string) {
         try {
-            return getDateFormat().parse(string);
+            return dateFormat.parse(string);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
@@ -164,31 +169,15 @@ public class DateTimeStringConverter extends BaseStringConverter<Date> {
 
     @Override
     String toStringFromNonNull(Date data) {
-        return getDateFormat().format(data);
+        return dateFormat.format(data);
     }
 
-    // --------------------------------------------------------- Private Methods
-
     /**
-     * <p>Return a <code>DateFormat</code> instance to use for formatting
-     * and parsing in this {@link StringConverter}.</p>
+     * Returns the {@code DateFormat} used for formatting and parsing in this {@code DateTimeStringConverter}.
      *
-     * @return a {@code DateFormat} instance for formatting and parsing in this
-     * {@link StringConverter}
+     * @return the {@code DateFormat} used for formatting and parsing in this {@code DateTimeStringConverter}
      */
     protected DateFormat getDateFormat() {
-        DateFormat df = null;
-
-        if (dateFormat != null) {
-            return dateFormat;
-        } else if (pattern != null) {
-            df = new SimpleDateFormat(pattern, locale);
-        } else {
-            df = DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);
-        }
-
-        df.setLenient(false);
-
-        return df;
+        return dateFormat;
     }
 }

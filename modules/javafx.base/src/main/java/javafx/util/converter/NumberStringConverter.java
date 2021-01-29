@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2021, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -30,22 +30,21 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
-import javafx.util.StringConverter;
 
 /**
- * A {@link StringConverter} implementation for {@link Number} values. Instances of this class are immutable.
+ * A {@code StringConverter} implementation for {@code Number} values. Instances of this class are immutable.
  *
  * @since JavaFX 2.1
  */
 public class NumberStringConverter extends BaseStringConverter<Number> {
 
-    private NumberFormat numberFormat;
+    private final NumberFormat numberFormat;
 
     /**
      * Constructs a {@code NumberStringConverter} with the default locale and format.
      */
     public NumberStringConverter() {
-        this(Locale.getDefault());
+        this((Locale) null);
     }
 
     /**
@@ -61,7 +60,7 @@ public class NumberStringConverter extends BaseStringConverter<Number> {
      * @see java.text.DecimalFormat
      */
     public NumberStringConverter(String pattern) {
-        this(Locale.getDefault(), pattern);
+        this(null, pattern);
     }
 
     /**
@@ -85,13 +84,18 @@ public class NumberStringConverter extends BaseStringConverter<Number> {
             this.numberFormat = numberFormat;
             return;
         }
-        Locale newLocale = locale == null ? Locale.getDefault() : locale;
+        locale = locale != null ? locale : Locale.getDefault();
         if (pattern != null) {
-            var symbols = new DecimalFormatSymbols(newLocale);
-            this.numberFormat =  new DecimalFormat(pattern, symbols);
+            var symbols = new DecimalFormatSymbols(locale);
+            this.numberFormat = new DecimalFormat(pattern, symbols);
             return;
         }
-        this.numberFormat = getSpecializedNumberFormat(newLocale);
+        this.numberFormat = getSpecializedNumberFormat(locale);
+    }
+
+    // treat as protected
+    NumberFormat getSpecializedNumberFormat(Locale locale) {
+        return NumberFormat.getNumberInstance(locale);
     }
 
     @Override
@@ -108,15 +112,12 @@ public class NumberStringConverter extends BaseStringConverter<Number> {
         return numberFormat.format(number);
     }
 
-    // treat as protected
-    NumberFormat getSpecializedNumberFormat(Locale locale) {
-        return NumberFormat.getNumberInstance(locale);
-    }
-
     /**
-     * Used for tests only
+     * Returns the {@code NumberFormat} instance used for formatting and parsing in this {@code NumberStringConverter}.
+     *
+     * @return the {@code NumberFormat} instance used for formatting and parsing in this {@code NumberStringConverter}
      */
-    NumberFormat getNumberFormat() {
+    protected NumberFormat getNumberFormat() {
         return numberFormat;
     }
 }

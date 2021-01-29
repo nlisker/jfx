@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2021, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -27,15 +27,11 @@ package javafx.util.converter;
 
 import java.text.NumberFormat;
 import java.util.Locale;
-import javafx.util.StringConverter;
 
 /**
- * A {@link StringConverter} implementation for {@link Number} values that represent percentages. Instances of this class are
- * immutable.
- *
- * @see CurrencyStringConverter
- * @see NumberStringConverter
- * @see StringConverter
+ * A {@code StringConverter} implementation for {code Number} values that represent percentages. Instances of this class
+ * are immutable.
+
  * @since JavaFX 2.1
  */
 public class PercentageStringConverter extends NumberStringConverter {
@@ -44,7 +40,7 @@ public class PercentageStringConverter extends NumberStringConverter {
      * Constructs a {@code PercentageStringConverter} with the default locale and format.
      */
     public PercentageStringConverter() {
-        super(Locale.getDefault());
+        super((Locale) null);
     }
 
     /**
@@ -62,7 +58,7 @@ public class PercentageStringConverter extends NumberStringConverter {
     }
 
     @Override
-    protected NumberFormat getSpecializedNumberFormat(Locale locale) {
+    NumberFormat getSpecializedNumberFormat(Locale locale) {
         return NumberFormat.getPercentInstance(locale);
     }
 }
