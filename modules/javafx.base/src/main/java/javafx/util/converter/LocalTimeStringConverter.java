@@ -26,17 +26,11 @@
 package javafx.util.converter;
 
 import java.time.LocalTime;
-import java.time.chrono.Chronology;
-import java.time.chrono.IsoChronology;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.DecimalStyle;
 import java.time.format.FormatStyle;
-import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalQuery;
 import java.util.Locale;
 import java.util.Objects;
-
-import javafx.util.StringConverter;
 
 /**
  * A {@code StringConverter} implementation for {@link LocalTime} values. Instances of this class are immutable.
@@ -45,16 +39,7 @@ import javafx.util.StringConverter;
  * @see LocalDateTimeStringConverter
  * @since JavaFX 8u40
  */
-public class LocalTimeStringConverter extends BaseStringConverter<LocalTime> {
-
-    private static final FormatStyle DEFAULT_STYLE = FormatStyle.SHORT;
-    private static final Chronology DEFAULT_CHRONOLOGY = IsoChronology.INSTANCE;
-    private static Locale defaultLocale() {
-        return Locale.getDefault(Locale.Category.FORMAT);
-    }
-
-    private final DateTimeFormatter formatter;
-    private final DateTimeFormatter parser;
+public class LocalTimeStringConverter extends BaseTemporalConverter<LocalTime> {
 
     /**
      * Create a {@code LocalTimeStringConverter} using a
@@ -74,7 +59,7 @@ public class LocalTimeStringConverter extends BaseStringConverter<LocalTime> {
      * formatter and parser. If null then {@link FormatStyle#SHORT} will be used.
      */
     public LocalTimeStringConverter(FormatStyle timeStyle) {
-        this(timeStyle, defaultLocale());
+        this(timeStyle, DEFAULT_LOCALE);
     }
 
     /**
@@ -89,10 +74,7 @@ public class LocalTimeStringConverter extends BaseStringConverter<LocalTime> {
      * {@code Locale.getDefault(Locale.Category.FORMAT)} will be used.
      */
     public LocalTimeStringConverter(FormatStyle timeStyle, Locale locale) {
-        timeStyle = Objects.requireNonNullElse(timeStyle, DEFAULT_STYLE);
-        locale = Objects.requireNonNullElseGet(locale, () -> defaultLocale());
-        parser = getDefaultParser(timeStyle, locale);
-        formatter = getDefaultFormatter(timeStyle, locale);
+        super(null, Objects.requireNonNullElse(timeStyle, DEFAULT_STYLE), locale, null);
     }
 
     /**
@@ -118,37 +100,16 @@ public class LocalTimeStringConverter extends BaseStringConverter<LocalTime> {
      * used.
      */
     public LocalTimeStringConverter(DateTimeFormatter formatter, DateTimeFormatter parser) {
-        this.formatter = formatter == null ? getDefaultFormatter(DEFAULT_STYLE, defaultLocale()) : formatter;
-        this.parser = parser == null ?
-                (formatter == null ? getDefaultParser(DEFAULT_STYLE, defaultLocale()) : this.formatter) : parser;
-    }
-
-    private DateTimeFormatter getDefaultParser(FormatStyle timeStyle, Locale locale) {
-        String pattern = DateTimeFormatterBuilder.getLocalizedDateTimePattern(null, timeStyle, DEFAULT_CHRONOLOGY, locale);
-        return new DateTimeFormatterBuilder().parseLenient()
-                                             .appendPattern(pattern)
-                                             .toFormatter()
-                                             .withDecimalStyle(DecimalStyle.of(locale));
-    }
-
-    /**
-     * <p>Return a default <code>DateTimeFormatter</code> instance to use for formatting
-     * and parsing in this {@link StringConverter}.</p>
-     */
-    private DateTimeFormatter getDefaultFormatter(FormatStyle timeStyle, Locale locale) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedTime(timeStyle);
-        return formatter.withLocale(locale)
-                        .withDecimalStyle(DecimalStyle.of(locale));
+        super(formatter, parser, null, DEFAULT_STYLE);
     }
 
     @Override
-    LocalTime fromNonEmptyString(String string) {
-        TemporalAccessor temporal = parser.parse(string);
-        return LocalTime.from(temporal);
+    protected DateTimeFormatter getLocalizedFormatter(FormatStyle dateStyle, FormatStyle timeStyle) {
+        return DateTimeFormatter.ofLocalizedTime(timeStyle);
     }
 
     @Override
-    String toStringFromNonNull(LocalTime value) {
-        return formatter.format(value);
+    protected TemporalQuery<LocalTime> getTemporalQuery() {
+        return LocalTime::from;
     }
 }

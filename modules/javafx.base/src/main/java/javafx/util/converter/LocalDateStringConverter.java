@@ -25,20 +25,14 @@
 
 package javafx.util.converter;
 
-import java.time.DateTimeException;
 import java.time.LocalDate;
-import java.time.chrono.ChronoLocalDate;
 import java.time.chrono.Chronology;
 import java.time.chrono.IsoChronology;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.DecimalStyle;
 import java.time.format.FormatStyle;
-import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalQuery;
 import java.util.Locale;
 import java.util.Objects;
-
-import com.sun.javafx.binding.Logging;
 
 /**
  * A {@code StringConverter} implementation for {@link LocalDate} values. Instances of this class are immutable.
@@ -47,16 +41,7 @@ import com.sun.javafx.binding.Logging;
  * @see LocalDateTimeStringConverter
  * @since JavaFX 8u40
  */
-public class LocalDateStringConverter extends BaseStringConverter<LocalDate> {
-
-    private static final FormatStyle DEFAULT_STYLE = FormatStyle.SHORT;
-    private static final Chronology DEFAULT_CHRONOLOGY = IsoChronology.INSTANCE;
-    private static Locale defaultLocale() {
-        return Locale.getDefault(Locale.Category.FORMAT);
-    }
-
-    private final DateTimeFormatter formatter;
-    private final DateTimeFormatter parser;
+public class LocalDateStringConverter extends BaseTemporalConverter<LocalDate> {
 
     /**
      * Create a {@code LocalDateStringConverter} using a
@@ -85,7 +70,7 @@ public class LocalDateStringConverter extends BaseStringConverter<LocalDate> {
      * formatter and parser. If {@code null}, then {@link FormatStyle#SHORT} will be used.
      */
     public LocalDateStringConverter(FormatStyle dateStyle) {
-        this(dateStyle, defaultLocale(), DEFAULT_CHRONOLOGY);
+        this(dateStyle, DEFAULT_LOCALE, DEFAULT_CHRONOLOGY);
     }
 
     /**
@@ -101,11 +86,7 @@ public class LocalDateStringConverter extends BaseStringConverter<LocalDate> {
      * formatter and parser. If {@code null} then {@link IsoChronology#INSTANCE} will be used.
      */
     public LocalDateStringConverter(FormatStyle dateStyle, Locale locale, Chronology chronology) {
-        dateStyle = Objects.requireNonNullElse(dateStyle, DEFAULT_STYLE);
-        locale = Objects.requireNonNullElseGet(locale, () -> defaultLocale());
-        chronology = Objects.requireNonNullElse(chronology, DEFAULT_CHRONOLOGY);
-        parser = getDefaultParser(dateStyle, locale, chronology);
-        formatter = getDefaultFormatter(dateStyle, locale, chronology);
+        super(Objects.requireNonNullElse(dateStyle, DEFAULT_STYLE), null, locale, chronology);
     }
 
     /**
@@ -132,63 +113,16 @@ public class LocalDateStringConverter extends BaseStringConverter<LocalDate> {
      * then a default parser will be used.
      */
     public LocalDateStringConverter(DateTimeFormatter formatter, DateTimeFormatter parser) {
-        this.formatter = formatter == null ?
-                (getDefaultFormatter(DEFAULT_STYLE, defaultLocale(), DEFAULT_CHRONOLOGY)) :
-                (formatter.getChronology() == null ? formatter.withChronology(DEFAULT_CHRONOLOGY) : formatter);
-        this.parser = parser == null ?
-                (formatter == null ? getDefaultParser(DEFAULT_STYLE, defaultLocale(), DEFAULT_CHRONOLOGY) : this.formatter) :
-                (parser.getChronology() == null ? parser.withChronology(DEFAULT_CHRONOLOGY) : parser);
-    }
-
-    private DateTimeFormatter getDefaultParser(FormatStyle dateStyle, Locale locale, Chronology chronology) {
-        String pattern = DateTimeFormatterBuilder.getLocalizedDateTimePattern(dateStyle, null, chronology, locale);
-        return new DateTimeFormatterBuilder().parseLenient()
-                                             .appendPattern(pattern)
-                                             .toFormatter()
-                                             .withChronology(chronology)
-                                             .withDecimalStyle(DecimalStyle.of(locale));
-    }
-
-    /**
-     * Return a default {@code DateTimeFormatter} instance to use for formatting
-     * and parsing in this {@code LocalDateStringConverter}.
-     */
-    private DateTimeFormatter getDefaultFormatter(FormatStyle dateStyle, Locale locale, Chronology chronology) {
-        var formatter = DateTimeFormatter.ofLocalizedDate(dateStyle);
-        formatter = formatter.withLocale(locale)
-                             .withChronology(chronology)
-                             .withDecimalStyle(DecimalStyle.of(locale));
-        return fixFourDigitYear(formatter, dateStyle, locale, chronology);
-    }
-
-    private DateTimeFormatter fixFourDigitYear(DateTimeFormatter formatter, FormatStyle dateStyle, Locale locale,
-                                               Chronology chronology) {
-        String pattern = DateTimeFormatterBuilder.getLocalizedDateTimePattern(dateStyle, null, chronology, locale);
-        if (pattern.contains("yy") && !pattern.contains("yyy")) {
-            // Modify pattern to show four-digit year, including leading zeros.
-            String newPattern = pattern.replace("yy", "yyyy");
-            return DateTimeFormatter.ofPattern(newPattern).withDecimalStyle(DecimalStyle.of(locale));
-        }
-        return formatter;
+        super(formatter, parser, DEFAULT_STYLE, null);
     }
 
     @Override
-    LocalDate fromNonEmptyString(String string) {
-        TemporalAccessor temporal = parser.parse(string);
-        return LocalDate.from(parser.getChronology().date(temporal));
-//        return LocalDate.parse(string, parser);
+    protected DateTimeFormatter getLocalizedFormatter(FormatStyle dateStyle, FormatStyle timeStyle) {
+        return DateTimeFormatter.ofLocalizedDate(dateStyle);
     }
 
     @Override
-    String toStringFromNonNull(LocalDate value) {
-        ChronoLocalDate cDate;
-        try {
-            cDate = formatter.getChronology().date(value);
-        } catch (DateTimeException ex) {
-            Logging.getLogger().warning("Converting LocalDate " + value + " to " + formatter.getChronology()
-                    + " failed, falling back to IsoChronology.", ex);
-            cDate = value;
-        }
-        return formatter.format(cDate);
+    protected TemporalQuery<LocalDate> getTemporalQuery() {
+        return LocalDate::from;
     }
 }
