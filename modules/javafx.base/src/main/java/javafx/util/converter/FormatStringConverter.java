@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2021, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -30,7 +30,7 @@ import javafx.beans.NamedArg;
 import javafx.util.StringConverter;
 
 /**
- * A {@link StringConverter} implementation that can use a {@link Format}
+ * A {@code StringConverter} implementation that can use a {@link Format}
  * instance to convert arbitrary types to and from a string.
  *
  * @param <T> the type converted to/from a string

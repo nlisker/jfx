@@ -28,10 +28,11 @@ package javafx.util.converter;
 import javafx.util.StringConverter;
 
 /**
- * <p>{@link StringConverter} implementation for {@link String} values.</p>
+ * A {@code StringConverter} implementation for {@link String} values.
+ *
  * @since JavaFX 2.1
  */
-public class DefaultStringConverter extends StringConverter<String> {
+public class DefaultStringConverter extends BaseStringConverter<String> {
 
     /**
      * Creates a default {@code DefaultStringConverter}.
@@ -39,14 +40,15 @@ public class DefaultStringConverter extends StringConverter<String> {
     public DefaultStringConverter() {
     }
 
-
     /** {@inheritDoc} */
-    @Override public String toString(String value) {
-        return (value != null) ? value : "";
+    @Override
+    public String fromString(String value) {
+        return value;
     }
 
-    /** {@inheritDoc} */
-    @Override public String fromString(String value) {
-        return value;
+    @Override
+    String fromNonEmptyString(String string) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
