@@ -41,6 +41,7 @@ public interface PhongMaterial extends Material {
 
     public void setDiffuseColor(float r, float g, float b, float a);
     public void setSpecularColor(boolean set, float r, float g, float b, float a);
+    public void setSelfIlluminationColor(float r, float g, float b, float a);
 
     public void setTextureMap(TextureMap map);
 

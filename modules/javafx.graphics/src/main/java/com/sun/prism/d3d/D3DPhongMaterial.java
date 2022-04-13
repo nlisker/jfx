@@ -72,6 +72,11 @@ class D3DPhongMaterial extends BasePhongMaterial implements PhongMaterial {
     }
 
     @Override
+    public void setSelfIlluminationColor(float r, float g, float b, float a) {
+        context.setSelfIlluminationColor(nativeHandle, r, g, b, a);
+    }
+
+    @Override
     public void setTextureMap(TextureMap map) {
         maps[map.getType().ordinal()] = map;
     }

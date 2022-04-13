@@ -51,6 +51,10 @@ D3DPhongMaterial::D3DPhongMaterial(D3DContext *ctx) {
     specularColor[1] = 1;
     specularColor[2] = 1;
     specularColor[3] = 32;
+    selfIlluminationColor[0] = 0;
+    selfIlluminationColor[1] = 0;
+    selfIlluminationColor[2] = 0;
+    selfIlluminationColor[3] = 0;
     map[DIFFUSE] = NULL;
     map[SPECULAR] = NULL;
     map[BUMP] = NULL;
@@ -78,6 +82,17 @@ void D3DPhongMaterial::setSpecularColor(bool set, float r, float g, float b, flo
 
 float * D3DPhongMaterial::getSpecularColor() {
     return specularColor;
+}
+
+void D3DPhongMaterial::setSelfIlluminationColor(float r, float g, float b, float a) {
+    selfIlluminationColor[0] = r;
+    selfIlluminationColor[1] = g;
+    selfIlluminationColor[2] = b;
+    selfIlluminationColor[3] = a;
+}
+
+float * D3DPhongMaterial::getSelfIlluminationColor() {
+    return selfIlluminationColor;
 }
 
 bool D3DPhongMaterial::isBumpMap() {

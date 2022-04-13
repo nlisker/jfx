@@ -92,8 +92,35 @@ float4 main(ObjectPsIn objAttr, LocalBump  lSpace) : color {
 
     float3 rez = (ambColor.xyz+diff)*tDiff.xyz + spec*tSpec.rgb;
 
-    if (isIlluminated)
-        rez += tex2D(mapSelfIllum, objAttr.texD).xyz;
+    // Non: color = 0, 0, 0 OR map = 0, 0, 0
+    // Only Map: color = 1, 1, 1
+    // Only color: map = 1, 1, 1
+    // Both: ...
+
+    // if (map) {
+    //    if (color) {
+    //       multiply
+    //    } else {
+    //       color = 1 1 1 (Black)
+    //    }
+    // } no map {
+    //    if (color) {
+    //       color
+    //    } else {
+    //       skip
+    //    }
+    // }
+
+    if (isIlluminated) {
+        float4 tIllum = tex2D(mapSelfIllum, objAttr.texD);
+        tIllum.rgb *= gSelfIllumColor.rgb;
+        rez += tIllum.rgb;
+    } else {
+        rez += gSelfIllumColor.rgb;
+    }
+
+//    if (isIlluminated)
+//        rez += tex2D(mapSelfIllum, objAttr.texD).xyz;
 
     return float4( saturate(rez), tDiff.a);
 }

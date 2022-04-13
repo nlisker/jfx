@@ -461,6 +461,8 @@ class D3DContext extends BaseShaderContext {
             float r, float g, float b, float a);
     private static native void nSetSpecularColor(long pContext, long nativePhongMaterial,
             boolean set, float r, float g, float b, float a);
+    private static native void nSetSelfIlluminationColor(long pContext, long nativePhongMaterial,
+            float r, float g, float b, float a);
     private static native void nSetMap(long pContext, long nativePhongMaterial,
             int mapType, long texID);
     private static native long nCreateD3DMeshView(long pContext, long nativeMesh);
@@ -570,6 +572,10 @@ class D3DContext extends BaseShaderContext {
 
     void setSpecularColor(long nativePhongMaterial, boolean set, float r, float g, float b, float a) {
         nSetSpecularColor(pContext, nativePhongMaterial, set, r, g, b, a);
+    }
+
+    void setSelfIlluminationColor(long nativePhongMaterial, float r, float g, float b, float a) {
+        nSetSelfIlluminationColor(pContext, nativePhongMaterial, r, g, b, a);
     }
 
     void setMap(long nativePhongMaterial, int mapType, long nativeTexture) {

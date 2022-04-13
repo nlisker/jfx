@@ -43,6 +43,8 @@ public:
     float *getDiffuseColor();
     void setSpecularColor(bool set, float r, float g, float b, float a);
     float *getSpecularColor();
+    void setSelfIlluminationColor(float r, float g, float b, float a);
+    float *getSelfIlluminationColor();
     void setMap(int mapID, IDirect3DBaseTexture9 *texMap);
     bool isBumpMap();
     bool isSpecularMap();
@@ -52,7 +54,7 @@ public:
 
 private:
     D3DContext *context;
-    float diffuseColor[4], specularColor[4];
+    float diffuseColor[4], specularColor[4], selfIlluminationColor[4];
     IDirect3DBaseTexture9 *map[4];
     bool specularColorSet;
 };

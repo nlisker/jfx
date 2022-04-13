@@ -52,6 +52,8 @@ public class NGPhongMaterial {
 
     private TextureMap bumpMap = new TextureMap(PhongMaterial.MapType.BUMP);
 
+    private Color selfIllumColor;
+    private boolean selfIllumColorDirty = true;
     private TextureMap selfIllumMap = new TextureMap(PhongMaterial.MapType.SELF_ILLUM);
 
     Material createMaterial(ResourceFactory f) {
@@ -71,6 +73,7 @@ public class NGPhongMaterial {
     private void disposeMaterial() {
         diffuseColorDirty = true;
         specularColorDirty = true;
+        selfIllumColorDirty = true;
         specularPowerDirty = true;
         diffuseMap.setDirty(true);
         specularMap.setDirty(true);
@@ -82,7 +85,6 @@ public class NGPhongMaterial {
     }
 
     private void validate(ResourceFactory f) {
-
         if (diffuseColorDirty) {
             if (diffuseColor != null) {
                 material.setDiffuseColor(
@@ -92,6 +94,19 @@ public class NGPhongMaterial {
                 material.setDiffuseColor(0, 0, 0, 0);
             }
             diffuseColorDirty = false;
+        }
+
+        if (selfIllumColorDirty) {
+            if (selfIllumColor != null) {
+                float r = selfIllumColor.getRed();
+                float g = selfIllumColor.getGreen();
+                float b = selfIllumColor.getBlue();
+                float a = selfIllumColor.getAlpha();
+                material.setSelfIlluminationColor(r, g, b, a);
+            } else {
+                material.setSelfIlluminationColor(1, 1, 1, 1);
+            }
+            selfIllumColorDirty = false;
         }
 
         if (diffuseMap.isDirty()) {
@@ -131,6 +146,11 @@ public class NGPhongMaterial {
     public void setSpecularColor(Object specularColor) {
         this.specularColor = (Color)specularColor;
         specularColorDirty = true;
+    }
+
+    public void setSelfIllumColor(Object selfIllumColor) {
+        this.selfIllumColor = (Color)selfIllumColor;
+        selfIllumColorDirty = true;
     }
 
     public void setSpecularPower(float specularPower) {

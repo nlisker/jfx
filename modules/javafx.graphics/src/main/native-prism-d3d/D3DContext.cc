@@ -352,6 +352,23 @@ JNIEXPORT void JNICALL Java_com_sun_prism_d3d_D3DContext_nSetSpecularColor
 
     phongMaterial->setSpecularColor(set ? true : false, r, g, b, a);
 }
+
+/*
+ * Class:     com_sun_prism_d3d_D3DContext
+ * Method:    nSetSelfIlluminationColor
+ * Signature: (JJFFFF)V
+ */
+JNIEXPORT void JNICALL Java_com_sun_prism_d3d_D3DContext_nSetSelfIlluminationColor
+  (JNIEnv *env, jclass, jlong ctx, jlong nativePhongMaterial,
+        jfloat r, jfloat g, jfloat b, jfloat a)
+{
+    TraceLn(NWT_TRACE_INFO, "D3DContext_nSetSelfIlluminationColor");
+    D3DPhongMaterial *phongMaterial = (D3DPhongMaterial *) jlong_to_ptr(nativePhongMaterial);
+    RETURN_IF_NULL(phongMaterial);
+
+    phongMaterial->setSelfIlluminationColor(r, g, b, a);
+}
+
 /*
  * Class:     com_sun_prism_d3d_D3DContext
  * Method:    nSetMap

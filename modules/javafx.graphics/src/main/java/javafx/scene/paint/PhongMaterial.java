@@ -60,7 +60,7 @@ import javafx.scene.image.Image;
  *
  * color = (ambient + diffuse) * diffuseColor * diffuseMap
  *             + specular * specularColor * specularMap
- *             + selfIlluminationMap
+ *             + selfIlluminationColor * selfIlluminationMap
  * }</pre>
  * where
  * {@code lightColor[i]} is the color of light source i,<br>
@@ -77,6 +77,7 @@ public class PhongMaterial extends Material {
 
     private boolean diffuseColorDirty = true;
     private boolean specularColorDirty = true;
+    private boolean selfIlluminationColorDirty = true;
     private boolean specularPowerDirty = true;
     private boolean diffuseMapDirty = true;
     private boolean specularMapDirty = true;
@@ -177,6 +178,34 @@ public class PhongMaterial extends Material {
             };
         }
         return specularColor;
+    }
+
+    /**
+     * The self-illumination color of this {@code PhongMaterial}.
+     *
+     * @defaultValue null
+     */
+    private ObjectProperty<Color> selfIlluminationColor;
+
+    public final void setSelfIlluminationColor(Color value) {
+        selfIlluminationColorProperty().set(value);
+    }
+
+    public final Color getSelfIlluminationColor() {
+        return selfIlluminationColor == null ? null : selfIlluminationColor.get();
+    }
+
+    public final ObjectProperty<Color> selfIlluminationColorProperty() {
+        if (selfIlluminationColor == null) {
+            selfIlluminationColor = new SimpleObjectProperty<>(PhongMaterial.this, "selfIllumination") {
+                @Override
+                protected void invalidated() {
+                    selfIlluminationColorDirty = true;
+                    setDirty(true);
+                }
+            };
+        }
+        return selfIlluminationColor;
     }
 
     /**
@@ -434,6 +463,7 @@ public class PhongMaterial extends Material {
         if (!value) {
             diffuseColorDirty = false;
             specularColorDirty = false;
+            selfIlluminationColorDirty = false;
             specularPowerDirty = false;
             diffuseMapDirty = false;
             specularMapDirty = false;
@@ -468,6 +498,10 @@ public class PhongMaterial extends Material {
             pMaterial.setSpecularColor(getSpecularColor() == null ? null
                     : Toolkit.getPaintAccessor().getPlatformPaint(getSpecularColor()));
         }
+        if (selfIlluminationColorDirty) {
+            pMaterial.setSelfIllumColor(getSelfIlluminationColor() == null ? null
+                    : Toolkit.getPaintAccessor().getPlatformPaint(getSelfIlluminationColor()));
+        }
         if (specularPowerDirty) {
             pMaterial.setSpecularPower((float)getSpecularPower());
         }
@@ -494,6 +528,7 @@ public class PhongMaterial extends Material {
     @Override public String toString() {
         return "PhongMaterial[" + "diffuseColor=" + getDiffuseColor() +
                 ", specularColor=" + getSpecularColor() +
+                ", selfIlluminationColor=" + getSelfIlluminationColor() + 
                 ", specularPower=" + getSpecularPower() +
                 ", diffuseMap=" + getDiffuseMap() +
                 ", specularMap=" + getSpecularMap() +
